@@ -8,6 +8,7 @@
  *
  * @package WordPress
  */
+define('WPLANG', 'pt-PT');
 
 ignore_user_abort(true);
 
