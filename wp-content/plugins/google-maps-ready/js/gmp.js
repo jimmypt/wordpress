@@ -36,7 +36,9 @@ jQuery(document).ready(function(){
 		jQuery(this).addClass('btn-primary');
 	});
 	jQuery('.gmpShowNewMapFormBtn').click(function(){
-		gmpShowAddMap();
+		if(checkAdminFormSaved()) {
+			gmpShowAddMap();
+		}
 		return false;
 	});
 	jQuery('#gmpEditMapContent').tabs();

@@ -1,7 +1,7 @@
 <?php
 class  marker_groupsGmp extends moduleGmp {
     public function init(){
-		if(frameGmp::isAdminPlugPage()){
+		if(frameGmp::_()->isAdminPlugPage()){
 		   frameGmp::_()->addScript("admin.group",$this->getModPath()."js/admin.group.js");			
 		}
     }

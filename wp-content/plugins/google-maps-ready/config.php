@@ -35,7 +35,6 @@
     define('GMP_IMG_PATH', $pluginUrl.'/'.basename(dirname(__FILE__)).'/img/');
     define('GMP_MODULES_PATH', $pluginUrl.'/'.basename(dirname(__FILE__)).'/modules/');
     define('GMP_TEMPLATES_PATH', $pluginUrl.'/'.basename(dirname(__FILE__)).'/templates/');
-    define('S_IMG_POSTS_PATH', GMP_IMG_PATH. 'posts/');
     define('GMP_JS_DIR', GMP_DIR. 'js/');
 
     define('GMP_URL', GMP_SITE_URL);
@@ -56,7 +55,7 @@
     
     
     define('GMP_PLUGIN_INSTALLED', true);
-    define('GMP_VERSION', '1.1.2');
+    define('GMP_VERSION', '1.1.4');
     define('GMP_USER', 'user'); 
     
     

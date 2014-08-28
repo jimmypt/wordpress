@@ -19,7 +19,6 @@ class gmap_widgetViewGmp extends viewGmp {
 			}
 		}
 		$this->assign('mapsOpts', $mapsOpts);
-		$this->assign('maps');
         $this->displayWidgetForm($data, $widget);
     }
 }

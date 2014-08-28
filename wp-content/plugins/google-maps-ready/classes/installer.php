@@ -265,7 +265,7 @@ class installerGmp {
 		   delete_option('gmp_def_icons_installed');
 		   delete_option(GMP_DB_PREF. 'db_version');
 		   delete_option($wpPrefix.GMP_DB_PREF.'db_installed');
-		   delete_option(GMP_DB_PREF. 'plug_was_used');       
+		   //delete_option(GMP_DB_PREF. 'plug_was_used');       
 		}
 	}
 	static protected function _addPageToWP($post_title, $post_parent = 0) {

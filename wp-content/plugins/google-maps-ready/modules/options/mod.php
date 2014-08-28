@@ -6,15 +6,17 @@ class optionsGmp extends moduleGmp {
 	/**
 	 * Method to trigger the database update
 	 */
-	public function init(){
+	// Really - don't know what prev. developer tryed to say in this code, 
+	// there are no "find_us" code in options page, and there are no checkStatistic() function
+	/*public function init(){
 		parent::init();
 		if(!self::$saveStatistic){
-		   $data = frameGmp::_()->getTable('options')->get('*', " `code`='find_us' "); 
-		   $params = utilsGmp::jsonDecode($data[0]['params']);
-		   self::$saveStatistic = $params['save_statistic'];
+			$data = frameGmp::_()->getTable('options')->get('*', " `code`='find_us' "); 
+			$params = utilsGmp::jsonDecode($data[0]['params']);
+			self::$saveStatistic = $params['save_statistic'];
 		}
 		$this->checkStatistic();
-	}
+	}*/
 	/**
 	 * Returns the available tabs
 	 * 

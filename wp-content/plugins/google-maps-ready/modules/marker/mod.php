@@ -7,7 +7,7 @@ class  markerGmp extends moduleGmp {
 		dispatcherGmp::addAction('in_admin_footer',array($this,'showPluginFooter'));
 	}
 	public function addOptionsTab($tabs){
-		if(frameGmp::isAdminPlugPage()){
+		if(frameGmp::_()->isAdminPlugPage()){
 			frameGmp::_()->addScript('adminMetaOptions',$this->getModPath().'js/admin.marker.js',array(),false,true);			
 		}
 		return $tabs;

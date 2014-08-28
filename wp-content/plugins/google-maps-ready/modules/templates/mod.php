@@ -15,7 +15,7 @@ class templatesGmp extends moduleGmp {
         return $tabs;
     }
     public function init() {
-		if(frameGmp::isAdminPlugPage()){
+		if(frameGmp::_()->isAdminPlugPage()){
 			$this->_styles = array(
 				'styleGmp'				=> array('path' => GMP_CSS_PATH. 'style.css'), 
 				'adminStylesGmp'		=> array('path' => GMP_CSS_PATH. 'adminStyles.css'), 
@@ -46,7 +46,7 @@ class templatesGmp extends moduleGmp {
 			'ok_icon'					=> GMP_IMG_PATH. 'ok-icon.png',
 			'isHttps'					=> uriGmp::isHttps(),
         );
-		if(frameGmp::isAdminPlugPage()){
+		if(frameGmp::_()->isAdminPlugPage()){
 			frameGmp::_()->addScript('commonGmp', GMP_JS_PATH. 'common.js');
 			frameGmp::_()->addScript('coreGmp', GMP_JS_PATH. 'core.js');
 	
@@ -68,8 +68,8 @@ class templatesGmp extends moduleGmp {
         if (is_admin()) {
 			frameGmp::_()->addScript('ajaxupload', GMP_JS_PATH. 'ajaxupload.js');
 			frameGmp::_()->addScript('postbox', get_bloginfo('wpurl'). '/wp-admin/js/postbox.js');
-			add_thickbox();
-			
+			add_action('wp_enqueue_scripts', array($this, 'addThickbox'));
+
 			$jsData['allCheckRegPlugs']	= modInstallerGmp::getCheckRegPlugs();
 		} else {
 
@@ -102,4 +102,7 @@ class templatesGmp extends moduleGmp {
         }
         parent::init();
     }
+	public function addThickbox() {
+		add_thickbox();
+	}
 }

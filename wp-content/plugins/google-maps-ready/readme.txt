@@ -3,7 +3,7 @@ Contributors: Google Maps plugin
 Donate link: http://readyshoppingcart.com/product/google-maps-plugin/
 Tags: google map, google maps, map, maps, location, direction, marker, geocoder, post map, widget map, widget, google map widget, custom marker icons and text, custom marker text, geo, google map short code,  google map styles, openstreetmap, latitude, longitude, placemarker, pronamic, reverse geocode, v3, wp map, wp maps, google maps ready!
 Tested up to: 3.9.1
-Stable tag: 1.1.2
+Stable tag: 1.1.4
 License: GPLv2 or later
 
 Display custom Google Maps. Set markers and locations with text, images, categories and links. Customize google map without any programming skills
@@ -29,7 +29,7 @@ Customize google map and add to the post/page with shortcode or use as a widget.
 `[ready_google_map id='1' height='222' map_display_mode='map' type='HYBRID' map_language='fa' enable_zoom='0' enable_mouse_zoom='0' align='right']`
 For more info check [FAQ page](http://readyshoppingcart.com/product/google-maps-plugin/#faq "Google Maps plugin FAQ")
 
-[youtube http://www.youtube.com/watch?v=ypLl0GKyJIQ]
+[youtube http://www.youtube.com/watch?list=UUEUkgA_d6o3VPGYs4lVqqQg&v=drof_IwL51I]
 
 **Have you ever used a Google map plugin?** If not, you are welcome to check it out how it works and what a “Google map plugin” in total is. 
 This plugin is created to make your work easier and comfortable. For example let’s say that you have a site of your company where you have established the map to make your clients clearly understand the location of your office. 
@@ -47,24 +47,40 @@ For more information review google maps plugin [FAQ section](http://readyshoppin
 
 == Screenshots ==
 
-1. [Google Maps Plugin](http://readyshoppingcart.com/product/google-maps-plugin/ "Google Maps plugin")
+1. [Google Maps Plugin](http://readyshoppingcart.com/product/google-maps-plugin/ "Google Maps WordPress plugin")
 
 2. Markers sorting example
 
 == Changelog ==
+= 1.1.4 =
+ * Added dutch (Netherlands) translation
+ * Ask "Are you sure want to leave?" when user is on edit form and click "Add New Map" button
+ * Fix for static call frameGmp::isAdminPlugPage() as this is not static method
+
+= 1.1.3 =
+ * Small fixes of php warnings after testing in debug mode
+ * Correct thickbox activation - on wp_enqueue_scripts event
+ * Additional check for existing markers in PRO version - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Fix all places where http protocol was used instead of check current protocol and use it (if https - all scripts should be loaded throught https)
+ * PRO install - if there are no Free (Base) version - show error message - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Do not remove welcome page submit marker from wordpress instance on deactivation
+ * New welcome video - http://www.youtube.com/watch?v=drof_IwL51I
+ * Remove some unused constants
+ * Remove unused check in options module
+
 = 1.1.2 =
- * Added remove icons functionality
+ * Added "remove map icon" functionality option
  * Some small fixes for Https usage (correct links, image sources, etc.)
 
 = 1.1.1 =
  * Avoid javascript errors is there are no markers on map
- * Adjust some popups windows in admin area sizes
- * Adjust some popups windows in admin area sizes in PRO - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Adjust some map popups windows in admin area sizes
+ * Adjust google map popups windows in admin area sizes in PRO - https://readyshoppingcart.com/product/google-maps-plugin/
  * Custom maps controls, Clasterizations - fix some bugs to work with popup map type - https://readyshoppingcart.com/product/google-maps-plugin/
  * Added text to readme
 
 = 1.1.0 =
- * Fix for maps display after last release
+ * Fix for google maps display after last release
 
 = 1.0.9 =
  * Maps widget

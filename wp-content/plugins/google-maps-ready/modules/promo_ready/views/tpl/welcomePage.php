@@ -119,7 +119,7 @@ jQuery(document).ready(function(){
 
 		<h2>Video tutorial</h2>
 		<div class="video-wrapper">
-                <iframe width="640" height="360" src="//www.youtube.com/embed/ypLl0GKyJIQ" frameborder="0" allowfullscreen></iframe>
+			<iframe width="640" height="360" src="//www.youtube.com/embed/drof_IwL51I" frameborder="0" allowfullscreen></iframe>
 		</div>
 		<div class="clear"></div>
 		
