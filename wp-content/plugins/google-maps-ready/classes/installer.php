@@ -222,7 +222,7 @@ class installerGmp {
 		update_option(GMP_DB_PREF. 'plug_was_used', 1);
 	}
 	static public function isUsed() {
-		return  (bool)get_option(GMP_DB_PREF. 'plug_was_used');
+		return (bool)get_option(GMP_DB_PREF. 'plug_was_used');
 	}
 	/**
 	 * Create pages for plugin usage

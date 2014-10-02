@@ -20,10 +20,6 @@ class gmapControllerGmp extends controllerGmp {
 			$saveRes = $this->getModel()->saveNewMap($data['map_opts']);
 			$mapId = $saveRes;
 		}
-		/*$updateMarkers = array();
-		if(!empty($data['markers'])) {
-			$updateMarkers = frameGmp::_()->getModule('marker')->getModel()->updateMapMarkers($data['markers'], $data['map_opts']['id']);
-		}*/
 		if($saveRes) {
 			$addMarkerIds = reqGmp::getVar('add_marker_ids');
 			if($addMarkerIds && !empty($addMarkerIds)) {
@@ -38,26 +34,6 @@ class gmapControllerGmp extends controllerGmp {
 		frameGmp::_()->getModule('promo_ready')->getModel()->saveUsageStat('map.edit');
 		return $res->ajaxExec();
 	}
-	/*public function saveNewMap() {
-		$res = new responseGmp();
-		$data= reqGmp::get('post');
-			$mapId = $this->getModel()->saveNewMap($data['mapOpts']);
-			if($mapId) {
-				if(isset($data['markers']) && !empty($data['markers'])){
-					$addMarkers = frameGmp::_()->getModule('marker')-> getController()->saveMarkers($data['markers'],$mapId);
-					if(!$addMarkers){
-						$res->pushError(langGmp::_('cannot add makrkers'));                            
-					}
-				}
-				$res->addMessage(langGmp::_('Done'));
-				$res->addData(array('map_id'=>$mapId));
-			} else {
-				$res->pushError($this->getModel()->getErrors());
-			}
-		frameGmp::_()->getModule("promo_ready")->getModel()->saveUsageStat("map.save");                
-	  return $res->ajaxExec();
-	}  */
-
 	public function removeMap(){
 		$data=  reqGmp::get('post');
 		$res = new responseGmp();
@@ -74,12 +50,6 @@ class gmapControllerGmp extends controllerGmp {
 		frameGmp::_()->getModule("promo_ready")->getModel()->saveUsageStat("map.delete");            
 		return $res->ajaxExec();
 	}
-	/*public function getMapsList() {
-		$data = $this->getView()->showAllMaps(true);
-		$res = new responseGmp();
-		$res->setHtml($data);
-		return $res->ajaxExec();
-	}*/
 	public function getListForTable() {
 		$res = new responseGmp();
 		$res->ignoreShellData();
@@ -128,5 +98,15 @@ class gmapControllerGmp extends controllerGmp {
 			return $returnList[0];
 		}
 		return $returnList;
+	}
+	/**
+	 * @see controller::getPermissions();
+	 */
+	public function getPermissions() {
+		return array(
+			GMP_USERLEVELS => array(
+				GMP_ADMIN => array('getAllMaps', 'save', 'getListForTable')
+			),
+		);
 	}
 } 

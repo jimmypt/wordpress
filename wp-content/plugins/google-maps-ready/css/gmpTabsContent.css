@@ -27,10 +27,10 @@
 	clear: both;
 	float: left;
 	width: 100%;
-	margin: 8px auto 0 auto;
+	margin: 1px auto 0 auto;
 	border-bottom: 1px solid #edeff4;
 	min-height: 40px;
-	padding-top: 10px;
+	padding-top: 5px;
 }
 .gmpFormRow label {
     display: block;
@@ -39,8 +39,15 @@
     font-size: 15px;
     font-size: 13px !important;
 }
-.gmpFormRow input[type='text'],.gmpFormRow textarea,.gmpFormRow input,.gmpFormRow select,.gmpFormRow textarea{
+.gmpFormRow input[type='text'],
+.gmpFormRow textarea,
+.gmpFormRow input:not(.ed_button),
+.gmpFormRow select,
+.gmpFormRow textarea {
     float: right;
+}
+.wp-switch-editor {
+	min-height: 30px;
 }
 .gmpInputLarge{
     width: 214px !important;
@@ -311,9 +318,6 @@ a{
     -webkit-border-radius: 4px;
     -moz-border-radius: 4px;
     border-radius: 4px;
-}
-.gmpNewMapShortcodePreview{
-    display:none;
 }
 .gmpTable{
     margin-bottom: 10px;
@@ -978,7 +982,7 @@ label.hiddenLabelHint {
 	box-shadow: 0px 0px 7px 1px rgb(116, 114, 114);
 	border-radius: 4px;
 	padding: 6px;
-	z-index: 1000000;
+	z-index: 9999;
 	max-height: 30px;
 	white-space: nowrap;
 	margin: 0;

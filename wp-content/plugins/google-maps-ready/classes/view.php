@@ -93,4 +93,7 @@ abstract class viewGmp extends baseObjectGmp {
 		}
 		self::display($formTpl);
 	}
+	public function getInlineContent($tpl = '') {
+		return preg_replace('/\s+/', ' ', $this->getContent($tpl));
+	}
 }

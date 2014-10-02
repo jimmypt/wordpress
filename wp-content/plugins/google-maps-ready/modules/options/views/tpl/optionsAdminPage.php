@@ -11,9 +11,6 @@
      wp_enqueue_script('media-models');
      wp_enqueue_script('media-upload');
      wp_enqueue_media();
-     /*if(empty($this->defaultOpenTab)){
-         $this->defaultOpenTab = 'gmpAddNewMap';
-     }*/
 ?>
 <script type="text/javascript">
 	gmpDefaultOpenTab = "<?php echo $this->defaultOpenTab;?>";
@@ -45,6 +42,3 @@
 	</div>
 	<?php }?>
 </div>
-<?php /*?><div id="gmpAdminTemplatesSelection">
-	<?php echo $this->presetTemplatesHtml;?>
-</div><?php */?>

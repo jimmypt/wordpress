@@ -10,12 +10,9 @@ class promo_readyControllerGmp extends controllerGmp {
 			$res->pushError($this->getModel()->getErrors());
 		}
 		$originalPage = reqGmp::getVar('original_page');
-		//$returnArr = explode('|', $originalPage);
-		//$return = $this->getModule()->decodeSlug(str_replace('return=', '', $returnArr[1]));
 		$return = admin_url( strpos($originalPage, '?') ? $return : 'admin.php?page='. $originalPage);
 		// Start usage in any case
 		redirectGmp($return);
-		//return $res->ajaxExec();
 	}
 	public function saveUsageStat() {
 		$res = new responseGmp();

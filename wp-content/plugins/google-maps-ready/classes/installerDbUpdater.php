@@ -6,6 +6,7 @@ class installerDbUpdaterGmp {
 		self::update_05();
 		self::update_105();
 		self::update_109();
+		self::update_117();
 	}
 	
 	public static function update_044(){
@@ -32,5 +33,8 @@ class installerDbUpdaterGmp {
 	public static function update_109() {
 		dbGmp::query("INSERT INTO `@__modules` (id, code, active, type_id, params, has_tab, label, description)
 			VALUES (NULL, 'gmap_widget', 1, 1, '', 0, 'gmap_widget', 'gmap_widget')");
+	}
+	public static function update_117() {
+		dbGmp::query("UPDATE @__options SET value_type = 'array' WHERE code = 'infowindow_size' LIMIT 1");
 	}
 }

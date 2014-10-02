@@ -40,20 +40,19 @@
 		padding-right: 20px;
 		width:29%;
 	}
-	
 	#gmpWelcomePageFindUsForm label {
 		line-height: 24px;
 		margin-left: 20px;
 		font-size: 14px;
 		display: block;
 	}
-        #statistic_check {
+	#statistic_check {
         float: left;
         margin-top: 4px;
-                }.statistic_check {
+	}
+	.statistic_check {
         float: left;
-       
-        }
+	}
 </style>
 <script type="text/javascript">
 // <!--
@@ -106,6 +105,7 @@ jQuery(document).ready(function(){
 		<div class="spacer"></div>
 
 		<h2>Where did you find us?</h2>
+		<i>Help us improve our solution for you. Any private info will not be sent. If you will not select any option - no data will be sent to our statistic server.</i>
 		<?php foreach($this->askOptions as $askId => $askOpt) { ?>
 			<label><?php echo htmlGmp::radiobutton('where_find_us', array('value' => $askId))?>&nbsp;<?php echo $askOpt['label']?></label>
 			<?php if($askId == 4 /*Find on the web*/) { ?>
@@ -149,18 +149,14 @@ jQuery(document).ready(function(){
 			<p>So check full features list <a target="_blank" href="http://wordpress.org/plugins/google-maps-ready/">here</a>.</p>
 		</div>
 		<div class="clear"></div>
-
 		<?php echo htmlGmp::hidden('pl', array('value' => 'gmp'))?>
 		<?php echo htmlGmp::hidden('mod', array('value' => 'promo_ready'))?>
 		<?php echo htmlGmp::hidden('action', array('value' => 'welcomePageSaveInfo'))?>
-		
+
 		<br />
 		<br />
-		<?php echo htmlGmp::submit('gonext', array('value' => 'Thank for check info. Start using plugin.', 'attrs' => 'class="button button-primary button-hero"'))?>
+		<?php echo htmlGmp::submit('gonext', array('value' => 'Thank for check info. Start using plugin.', 'attrs' => 'class="button button-primary button-hero" style="float: right; margin-right: 60px;"'))?>
 		<?php echo htmlGmp::hidden('original_page', array('value' => reqGmp::getVar('page')))?>
 		<span id="toeWelcomePageFindUsMsg"></span>
 	</form>
 </div>
-<?php
-
-?>

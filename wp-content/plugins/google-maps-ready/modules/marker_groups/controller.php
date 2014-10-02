@@ -37,4 +37,14 @@ class marker_groupsControllerGmp extends controllerGmp {
         frameGmp::_()->getModule("promo_ready")->getModel()->saveUsageStat("group.delete");
         return $res->ajaxExec();
     }
+	/**
+	 * @see controller::getPermissions();
+	 */
+	public function getPermissions() {
+		return array(
+			GMP_USERLEVELS => array(
+				GMP_ADMIN => array('refreshGroupsList', 'saveGoup', 'removeGroup')
+			),
+		);
+	}
 }

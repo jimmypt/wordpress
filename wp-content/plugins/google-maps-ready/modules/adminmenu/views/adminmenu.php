@@ -1,12 +1,15 @@
 <?php
 class adminmenuViewGmp extends viewGmp {
-    protected $_file = '';
+	/**
+	 * @deprecated since version 1.1.7
+	 */
+    //protected $_file = '';
     /**
      * Array for standart menu pages
      * @see initMenu method
      */
-    protected $_mainSlug = 'ready-google-maps';
-    public function init() {
+   /* protected $_mainSlug = 'ready-google-maps';*/
+    /*public function init() {
         $this->_file = __FILE__;
 		//
         $this->_options = array(
@@ -22,7 +25,7 @@ class adminmenuViewGmp extends viewGmp {
     public function initMenu() {
 		$mainSlug = dispatcherGmp::applyFilters('adminMenuMainSlug', $this->_mainSlug);	
 		$this->_options = dispatcherGmp::applyFilters('adminMenuOptions', $this->_options);
-		add_menu_page(langGmp::_('Ready! Google Maps'), langGmp::_('Ready! Google Maps'), 10, $this->_mainSlug, array(frameGmp::_()->getModule('options')->getView(), 'getAdminPage'), 'dashicons-admin-site');
+		add_menu_page(langGmp::_('Ready! Google Maps'), langGmp::_('Ready! Google Maps'), 'manage_options', $this->_mainSlug, array(frameGmp::_()->getModule('options')->getView(), 'getAdminPage'), 'dashicons-admin-site');
 		foreach($this->_options as $opt) {
 			add_submenu_page($mainSlug, langGmp::_($opt['title']), langGmp::_($opt['title']), $opt['capability'], $opt['menu_slug'], $opt['function']);
 		}
@@ -31,6 +34,6 @@ class adminmenuViewGmp extends viewGmp {
         return $this->_file;
     }
 	public function getMainSlug() {
-		return $this->_mainSlug;
-	}
+		return $this->getModule()->getMainSlug();
+	}*/
 }

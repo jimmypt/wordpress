@@ -2,8 +2,8 @@
 Contributors: Google Maps plugin
 Donate link: http://readyshoppingcart.com/product/google-maps-plugin/
 Tags: google map, google maps, map, maps, location, direction, marker, geocoder, post map, widget map, widget, google map widget, custom marker icons and text, custom marker text, geo, google map short code,  google map styles, openstreetmap, latitude, longitude, placemarker, pronamic, reverse geocode, v3, wp map, wp maps, google maps ready!
-Tested up to: 3.9.1
-Stable tag: 1.1.4
+Tested up to: 4.0
+Stable tag: 1.2.2
 License: GPLv2 or later
 
 Display custom Google Maps. Set markers and locations with text, images, categories and links. Customize google map without any programming skills
@@ -52,6 +52,60 @@ For more information review google maps plugin [FAQ section](http://readyshoppin
 2. Markers sorting example
 
 == Changelog ==
+= 1.2.2 =
+ * Fix marker description save from both - html and text - editor modes
+ * Do not try to move close button in infowindow - this can make error in displaying it, wait until google will add this to API
+ * Possibility to set image size to display as widget
+
+= 1.2.1 =
+ * Welcome page - send info only in case, when user selected at lease one answer
+ * New banners and icons
+ * User permission - allow to work with plugin users with capability "manage_options"
+ * Compatibility with some other google maps plugins
+
+= 1.2.0 =
+ * ID and shortcode show on map edit form
+ * Added text (qt) mode for marker description editor
+ * Do not change zoom level after adding new marker
+ * Show latest user added icons on the top of marker icons list
+ * New PRO version - KML/KMZ files, embed view type, adsense integration - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Traffic, Transit and Bicycling Layer - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Remove unused images - make plugin source more lighter
+ * Added new columns to CSV generator
+ * Code review
+
+= 1.1.9 =
+ * Added French language
+ * Access controls - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Maps and Markers audit log - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Added additional columns to CSV import/export
+ * Close marker window - move to left, save some space for description there
+ * Marker animation - added 3 types, fix adding it to database
+ * Code review
+
+= 1.1.8 =
+ * Unserialize function call issue
+ * Code improve - dispatcher - fix for multy-args doAction call
+
+= 1.1.7 =
+ * Added Denmark language
+ * Added Hungarian language
+ * Some additions for adding PRO modules functionality on multisite WP installations
+ * Option to show marker infowindow on mouse over or click (click by default)
+ * Additional PRO features integration - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Code review
+
+= 1.1.6 =
+ * Added Swedish language
+ * Fix some security issues
+ * Partial code review
+
+= 1.1.5 =
+ * Added Polish lang
+ * Remove all line breaks from map output - fix problems with wordpress wpautop filtering
+ * Load main map script - always in footer to make it work with all maps on page
+ * Code improvements
+
 = 1.1.4 =
  * Added dutch (Netherlands) translation
  * Ask "Are you sure want to leave?" when user is on edit form and click "Add New Map" button

@@ -47,16 +47,17 @@
                 <div class="gmpNewMapPreview" id="gmpEditMapsContainer"></div>
                 <div style="clear:both"></div>
                 <?php dispatcherGmp::doAction('underMapAdminFormData');?>
-                <div class="gmpNewMapShortcodePreview">
-                    <pre class="gmpPre"></pre>
-                </div>
             </div>
-        
             <div class="gmpNewMapTabs tab-content">
                 <div class="" id="newMapSubmitBtn">
                     <div class="gmpExistsMapOperations">
                        <div class="gmpMapOperationsMessages">
-                            <span class="editMapNameShowing text-info"><?php langGmp::_e('Map')?>: <span class="gmpEditingMapName text-default"></span></span>
+							<div style="float: left; padding-right: 10px; margin-top: -3px;" class="gmpShortCodePreview gmpShortCodePreviewForEditMap">
+								<span>[ready_google_map id='']</span>
+							</div>
+                            <span class="editMapNameShowing text-info"><?php langGmp::_e('Map ID')?>: 
+								<span class="gmpEditingMapId text-default"></span>
+							</span>
                        </div>
                     </div>
                 </div>

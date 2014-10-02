@@ -7,6 +7,7 @@ else if(jQuery.inArray(GMP_DATA.animationSpeed, ['fast', 'slow']) == -1)
 GMP_DATA.showSubscreenOnCenter = parseInt(GMP_DATA.showSubscreenOnCenter);
 var sdLoaderImgGmp = '<img src="'+ GMP_DATA.loader+ '" />';
 var gmpGeocoder;
+var gmpEvents = {};
 jQuery.fn.showLoaderGmp = function() {
     jQuery(this).html( sdLoaderImgGmp );
 }
@@ -130,9 +131,11 @@ jQuery.fn.animateClear = function() {
 /**
  * Hide content in element and then remove it
  */
-jQuery.fn.animateRemove = function(animationSpeed) {
+jQuery.fn.animateRemove = function(animationSpeed, callback) {
 	animationSpeed = animationSpeed == undefined ? GMP_DATA.animationSpeed : animationSpeed;
 	jQuery(this).hide(animationSpeed, function(){
+		if(callback && typeof(callback) === 'function')
+			callback(this);
 		jQuery(this).remove();
 	});
 }
@@ -320,7 +323,7 @@ function detectInputType(input) {
 	// TODO: add type detection for other inputs
 	if(input.hasClass('colorpicker_input'))
 		return 'colorpicker'
-	if(input.hasClass('hidden_val_input'))
+	if(input.hasClass('hidden_val_input') || input.data() == '')
 		return 'hidden_check'
 	var attrType = input.attr('type');
 	return attrType;
@@ -409,10 +412,10 @@ jQuery.fn.mapSearchAutocompleateGmp = function(params) {
 		var address = jQuery.trim(jQuery(this).val());
 		if(address && address != '') {
 			// We should remember that we have used this functionality - so send ajax request to save usage stat
-			jQuery.sendFormGmp({
+			/*jQuery.sendFormGmp({
 				msgElID: 'noMessages'
 			,	data: {mod: 'marker', action: 'saveFindAddressStat', reqType:'ajax'}
-			});
+			});*/
 			if(typeof(params.msgEl) === 'string')
 				params.msgEl = jQuery(params.msgEl);
 			params.msgEl.showLoaderGmp();
@@ -471,4 +474,63 @@ function gmpSwitchDataTablePagination(dataTbl) {
 		jQuery(dataTbl.nTableWrapper).find('.dataTables_paginate').show();
 		jQuery(dataTbl.nTableWrapper).find('.dataTables_length').show();
 	}
+}
+function gmpSortActionsByPrior(a, b) {
+	if(typeof(a.priority) == 'undefined' && typeof(b.priority) == 'undefined')
+		return 0;
+	if(typeof(a.priority) == 'undefined')
+		return -1;
+	if(typeof(b.priority) == 'undefined')
+		return 1;
+	if(a.priority > b.priority)
+		return 1;
+	if(a.priority < b.priority)
+		return -1;
+	return 0;
+}
+function gmpDoAction(tag) {
+	if(gmpEvents[ tag ]) {
+		gmpEvents[ tag ].sort( gmpSortActionsByPrior );
+		var callArgs = [];
+		for(var i in arguments) {
+			if(parseInt(i)) {
+				callArgs.push( arguments[i] );
+			}
+		}
+		for(var i in gmpEvents[ tag ]) {
+			callUserFuncArray(gmpEvents[ tag ][ i ].callback, callArgs);
+		}
+	}
+}
+function gmpAddAction(tag, callback, priority) {
+	if(typeof(gmpEvents[ tag ]) == 'undefined') {
+		gmpEvents[ tag ] = [];
+	}
+	gmpEvents[ tag ].push({
+		callback: callback
+	,	priority: priority
+	});
+}
+function gmpAdjustCloseBtnInfoPos(infoWnd, params) {
+	params = params || {};
+	var shell = jQuery('.gm-style-iw')
+	,	closeDiv = shell.next()
+	,	parent = shell.parent()
+	,	contentHtmlObj = shell.find('.gmpMarkerInfoWindow')
+	,	hasScrollBar = params.checkScrollContent ? contentHtmlObj.hasScrollBarH() : shell.hasScrollBarH();
+
+	if(!infoWnd.firstOpened) {
+		infoWnd.firstOpened = true;
+		infoWnd.parentWidth = parent.width();
+	}
+	contentHtmlObj.css({
+		'width': '100%'
+	});
+	shell.append( closeDiv );
+	shell.width(infoWnd.parentWidth - (hasScrollBar ? 15 : 0));	// 15 - for scroll bar
+	closeDiv.css({
+		'top': parseInt(closeDiv.css('top')) - 10
+	,	'right': parseInt(closeDiv.css('right')) + 10
+	});
+	parent.width(infoWnd.parentWidth);
 }

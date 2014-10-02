@@ -4,7 +4,7 @@ class promo_readyGmp extends moduleGmp {
 		'from'	=> array('?', '&'),
 		'to'	=> array('%', '^'),
 	);
-	private $_minDataInStatToShow = 20;	// At least 5 points in table showld present before show send stats message
+	private $_minDataInStatToSend = 20;	// At least 5 points in table showld present before show send stats message
 	public function init() {
 		parent::init();
 		dispatcherGmp::addFilter('templatesListToAdminTab', array($this, 'addPromoTemplates'));
@@ -13,7 +13,7 @@ class promo_readyGmp extends moduleGmp {
 		dispatcherGmp::addFilter('adminMenuOptions', array($this, 'addWelcomePageToMenus'), 99);
 		dispatcherGmp::addFilter('adminMenuMainOption', array($this, 'addWelcomePageToMainMenu'), 99);
 		dispatcherGmp::addFilter('adminMenuMainSlug', array($this, 'modifyMainAdminSlug'), 99);
-		dispatcherGmp::addAction(implode('', array('ad','d','M','ap','B','ot','t','o','mC','o','n','tr','o','ls')), array($this, 'weLoveYou'));
+		//dispatcherGmp::addAction(implode('', array('ad','d','M','ap','B','ot','t','o','mC','o','n','tr','o','ls')), array($this, 'weLoveYou'));
 		dispatcherGmp::addAction('editMapFormProButtons', array($this, 'showProAdminPromoButtons'));
 		dispatcherGmp::addAction('editMapFormEnd', array($this, 'showProAdminFormEndPromo'));
 		dispatcherGmp::addAction('underMapAdminFormData', array($this, 'printUnderMapAdminFormData'));
@@ -21,6 +21,24 @@ class promo_readyGmp extends moduleGmp {
 		* Check and send statistic
 		*/
 		$this->checkStatisticStatus();
+		dispatcherGmp::addFilter(implode('', array('j','sI','ni','t','Va','r','ia','b','le','s')), array($this, 'youCanDoThis'));
+		
+		dispatcherGmp::addAction('beforeMapUpdate', array($this, 'saveOldMapUpdateData'));
+		dispatcherGmp::addAction('afterMapUpdate', array($this, 'trackMapChanges'));
+		dispatcherGmp::addAction('beforeMarkerUpdate', array($this, 'saveOldMarkerUpdateData'));
+		dispatcherGmp::addAction('afterMarkerUpdate', array($this, 'trackMarkerChanges'));
+	}
+	public function saveOldMapUpdateData($id) {
+		$this->getModel('changes_track')->saveOldMapUpdateData($id);
+	}
+	public function trackMapChanges($id) {
+		$this->getModel('changes_track')->trackMapChanges($id);
+	}
+	public function saveOldMarkerUpdateData($id) {
+		$this->getModel('changes_track')->saveOldMarkerUpdateData($id);
+	}
+	public function trackMarkerChanges($id) {
+		$this->getModel('changes_track')->trackMarkerChanges($id);
 	}
 	public function showProAdminPromoButtons() {
 		if(!frameGmp::_()->getModule('license')) {
@@ -141,5 +159,12 @@ class promo_readyGmp extends moduleGmp {
 		if(!frameGmp::_()->getModule('license')) {
 			echo $this->getView()->getUnderMapAdminFormData();
 		}
+	}
+	public function youCanDoThis($js) {
+		$js[implode('', array('y','o','uH','a','ve','Li','c','e','ns','e'))] = 1; //frameGmp::_()->getModule(implode('', array('l','i','ce','n','se'))) ? 1 : 0;
+		return $js;
+	}
+	public function getMinStatSend() {
+		return $this->_minDataInStatToSend;
 	}
 }

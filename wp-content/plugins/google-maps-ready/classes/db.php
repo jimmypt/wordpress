@@ -112,7 +112,7 @@ class dbGmp {
                 $d[ $i ] = self::prepareHtml( $el );
             }
         } else {
-            $d = htmlspecialchars($d);
+            $d = esc_html($d);
         }
         return $d;
     }

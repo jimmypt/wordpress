@@ -17,6 +17,9 @@ function getInfoWindow(title, content, markerItem, mapParams) {
 	var infoWindow = new google.maps.InfoWindow({
 		content: text
 	});
+	/*google.maps.event.addListener(infoWindow, 'domready', function(){
+		gmpAdjustCloseBtnInfoPos(this);
+	});*/
 	return infoWindow;
 }
 function gmpContentPrevFull(content, params) {
@@ -129,8 +132,8 @@ var gmapPreview = {
 			lat = mapForPreview.markers[0].coord_y;
 			lng = mapForPreview.markers[0].coord_x;
 		}
-		
-		var mapCenter = new google.maps.LatLng(lat,lng);
+
+		var mapCenter = new google.maps.LatLng(lat, lng);
 
 		var mapOptions = {
 			center: mapCenter
@@ -143,7 +146,6 @@ var gmapPreview = {
 		if(mapForPreview.params.enable_mouse_zoom == 1) {
 			mapOptions.disableDoubleClickZoom = false;
 			mapOptions.scrollwheel = true;
-			//mapOptions.draggable = true;
 		}
 		
 		mapOptions.mapTypeId = google.maps.MapTypeId[mapForPreview.params.type];
@@ -168,7 +170,7 @@ var gmapPreview = {
 			for(var i in this.maps[mapForPreview.id].onAfterDraw) {
 				this.maps[mapForPreview.id].onAfterDraw[i]( this.maps[mapForPreview.id] );
 			}
-		} 
+		}
 		delete map;
 	}
 ,	drawMarkers: function(markerList, mapId) {
@@ -199,11 +201,7 @@ var gmapPreview = {
 			};
 		}
 
-		var markerLatLng = new google.maps.LatLng(markerItem.coord_y, markerItem.coord_x)
-		,	animType = 2;
-		if(markerItem.animation == 1) {
-			animType = 1;
-		}
+		var markerLatLng = new google.maps.LatLng(markerItem.coord_y, markerItem.coord_x);
 		this.maps[mapId].markerArr[markerItem.id] = new google.maps.Marker({
 			position: markerLatLng
 		,	title: markerItem.title
@@ -211,23 +209,20 @@ var gmapPreview = {
 		,	icon: markerIcon
 		,	draggable: false
 		,	map: gmapPreview.maps[mapId].mapObject
-		,	animation: animType
+		,	animation: markerItem.animation
 		,	address: markerItem.address
 		,	id: markerItem.id
 		});
-		/*
-		if(parseInt(params.title_is_link) && params.marker_title_link){
-			markerItem.titleLink = {
-				linkEnabled: false
-			};
-		}*/
-		var infoWindow = getInfoWindow(markerItem.title, markerItem.description, markerItem, this.maps[mapId].mapParams);
-		google.maps.event.addListener(this.maps[mapId].markerArr[markerItem.id], 'click', function(){
+
+		var infoWindow = getInfoWindow(markerItem.title, markerItem.description, markerItem, this.maps[mapId].mapParams)
+		,	showWndEvent = parseInt(this.maps[mapId].mapParams.params.infowindow_on_mouseover) ? 'mouseover' : 'click';
+		
+		google.maps.event.addListener(this.maps[mapId].markerArr[markerItem.id], showWndEvent, function(){
 			for(var i in gmapPreview.maps[mapId].infoWindows) {
 				gmapPreview.maps[mapId].infoWindows[i].close();
 			}
 			infoWindow.open(gmapPreview.maps[mapId].mapObject, gmapPreview.maps[mapId].markerArr[markerItem.id]);
-			toggleBounce(gmapPreview.maps[mapId].markerArr[markerItem.id], animType);
+			toggleBounce(gmapPreview.maps[mapId].markerArr[markerItem.id], markerItem.animation);
 			if(typeof(gmpGoToMarkerInList) === 'function') {
 				gmpGoToMarkerInList(gmapPreview.maps[mapId].mapParams, gmapPreview.maps[mapId].markerArr[markerItem.id]);
 			}
@@ -289,15 +284,20 @@ function gmpKm2M(d) {
 	return d * 1000;
 }
 function gmpGetMapImgSrc(map) {
+	var imgSize = map.mapParams.params.img_width ? map.mapParams.params.img_width : 175;
+	imgSize += 'x';
+	imgSize += map.mapParams.params.img_height ? map.mapParams.params.img_height : 175;
+
 	var reqParams = {
 		center: map.mapParams.params.map_center.coord_y+ ','+ map.mapParams.params.map_center.coord_x
 	,	zoom: map.mapParams.params.zoom
-	,	size: '175x175'
+	,	size: imgSize
 	,	maptype: map.mapParams.params.type
 	,	sensor: 'false'
 	,	language: map.mapParams.params.language
 	};
 	var reqStr = (GMP_DATA.isHttps ? 'https' : 'http')+ '://maps.google.com/maps/api/staticmap?'+ jQuery.param(reqParams);
+	
 	if(map.mapParams.markers && map.mapParams.markers.length) {
 		for(var i in map.mapParams.markers) {
 			reqStr += '&markers=color:red|label:none|'+ map.mapParams.markers[i].coord_y+ ','+ map.mapParams.markers[i].coord_x;

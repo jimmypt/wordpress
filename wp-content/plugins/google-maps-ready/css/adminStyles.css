@@ -274,3 +274,9 @@ width: 100px;
 #gmpAdminOptionsTabs .ui-tabs {
 	position: static;
 }
+.gmpExample {
+	display: none;
+}
+.gmpMapWrapper {
+	position: relative;
+}

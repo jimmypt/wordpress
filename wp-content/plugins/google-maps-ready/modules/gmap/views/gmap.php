@@ -1,12 +1,17 @@
 <?php
 class gmapViewGmp extends viewGmp {
-	private $_gmapApiUrl = "https://maps.googleapis.com/maps/api/js?&sensor=false&language=";
-	public static $_mapsData;
+	//private $_gmapApiUrl = "https://maps.googleapis.com/maps/api/js?&sensor=false&=";
+	private $_gmapApiUrl = '';
+	private static $_mapsData;
 	private $_displayColumns = array();
 	// Used to compare rand IDs and original IDs on preview
 	private $_idToRandId = array();
-
+	
 	public function getApiUrl() {
+		if(empty($this->_gmapApiUrl)) {
+			$urlParams = dispatcherGmp::applyFilters('gApiUrlParams', array('sensor' => 'false'));
+			$this->_gmapApiUrl = 'https://maps.googleapis.com/maps/api/js?'. http_build_query($urlParams);
+		}
 		return $this->_gmapApiUrl;
 	}
 	public function getMapsTab() {
@@ -21,22 +26,14 @@ class gmapViewGmp extends viewGmp {
 		frameGmp::_()->addJSVar('mapOptions', 'GmpExistsMapsArr', $maps);
 		$this->assign('fromAjax', $fromAjax);
 		$this->assign('mapsArr', $maps);
-		/*$currentTab = reqGmp::getVar('tab');
-		if($currentTab == NULL){
-			if(!empty($data)){
-				$currentTab = 'gmpAllMaps';
-			} else {
-				$currentTab = 'gmpAddNewMap';
-			}
-		}
-		$this->assign('currentTab', $currentTab);	*/	
 		return parent::getContent('allMapsContent');
 	}
 	public function addMapData($params){
 		if(empty(self::$_mapsData)) {
 			self::$_mapsData = array();
 		}
-		self::$_mapsData[] = $params;
+		if(!empty($params))
+			self::$_mapsData[] = $params;
 	}
 	public function drawMap($params){
 		$ajaxurl = admin_url('admin-ajax.php');
@@ -63,6 +60,8 @@ class gmapViewGmp extends viewGmp {
 		frameGmp::_()->addJSVar('coreGmp', 'GMP_DATA', $jsData);
 		frameGmp::_()->addScript('jquery', '', array('jquery'));
 		$mapObj = frameGmp::_()->getModule('gmap')->getModel()->getMapById($params['id']);
+		if(empty($mapObj))
+			return;
 		if(isset($params['map_center']) 
 			&& is_string($params['map_center'])
 		) {
@@ -104,7 +103,7 @@ class gmapViewGmp extends viewGmp {
 				$mapObj['html_options'][$code] = $params[$code];
 			}
 		}
-		$shortCodeMapParams = $this->getModel()->getParamsList(); //array('map_display_mode', 'language', 'type', 'zoom', 'enable_zoom', 'enable_mouse_zoom');
+		$shortCodeMapParams = $this->getModel()->getParamsList();
 		foreach($shortCodeMapParams as $code){
 			if(isset($params[$code])) {
 				if(in_array($code, $paramsCanNotBeEmpty) && empty($params[$code])) continue;
@@ -113,12 +112,17 @@ class gmapViewGmp extends viewGmp {
 		}
 		if(isset($params['display_as_img']) && $params['display_as_img']) {
 			$mapObj['params']['map_display_mode'] = 'popup';
+			$mapObj['params']['img_width'] = isset($params['img_width']) ? $params['img_width'] : 175;
+			$mapObj['params']['img_height'] = isset($params['img_height']) ? $params['img_height'] : 175;
+		}
+		if(isset($params['display_as_img']) && $params['display_as_img']) {
+			$mapObj['params']['map_display_mode'] = 'popup';
 		}
 		if($mapObj['params']['map_display_mode'] == 'popup') {
 			frameGmp::_()->addScript('bpopup', GMP_JS_PATH. '/bpopup.js');
 		}
-		frameGmp::_()->addScript('google_maps_api_'. $mapObj['params']['language'], $this->getApiUrl(). $mapObj['params']['language']);
-		frameGmp::_()->addScript('map.options', $this->getModule()->getModPath(). 'js/map.options.js', array('jquery'));
+		frameGmp::_()->addScript('google_maps_api', $this->getApiUrl(). '&language='. $mapObj['params']['language']);
+		frameGmp::_()->addScript('map.options', $this->getModule()->getModPath(). 'js/map.options.js', array('jquery'), false, true);
 		
 		frameGmp::_()->addStyle('map_params', $this->getModule()->getModPath(). 'css/map.css');
 		
@@ -128,12 +132,12 @@ class gmapViewGmp extends viewGmp {
 		}
 		// This is for posibility to show multy maps with same ID on one page
 		$mapObj['original_id'] = $mapObj['id'];
-		if(isset($this->_idToRandId[ $mapObj['original_id'] ]))
+		/*if(isset($this->_idToRandId[ $mapObj['original_id'] ]))
 			$mapObj['id'] = $this->_idToRandId[ $mapObj['original_id'] ];
 		else
-			$this->_idToRandId[ $mapObj['original_id'] ] = $mapObj['id'] = mt_rand(1, 99999). $mapObj['id'];
+			$this->_idToRandId[ $mapObj['original_id'] ] = $mapObj['id'] = mt_rand(1, 99999). $mapObj['id'];*/
 		
-		$indoWindowSize = utilsGmp::unserialize(frameGmp::_()->getModule('options')->getModel('options')->get('infowindow_size'));
+		$indoWindowSize = frameGmp::_()->getModule('options')->getModel('options')->get('infowindow_size');
 		$this->assign('indoWindowSize', $indoWindowSize);
 		$this->assign('currentMap', $mapObj);
 		$markersDisplayType = '';
@@ -145,23 +149,14 @@ class gmapViewGmp extends viewGmp {
 			$markersDisplayType = $mapObj['params']['markers_list_type'];
 		}
 		$mapObj['params']['markers_list_type'] = $markersDisplayType;
-		$this->addMapData($mapObj);
-		
+		$this->addMapData(dispatcherGmp::applyFilters('mapDataToJs', $mapObj));
+
 		$this->assign('markersDisplayType', $markersDisplayType);
 		// This will require only in PRO, but we will make it here - to avoid code doubling
 		$this->assign('mapCategories', frameGmp::_()->getModule('marker_groups')->getModel()->getListForMarkers(isset($mapObj['markers']) ? $mapObj['markers'] : false));
 		
-		return parent::getContent('mapPreview');
+		return parent::getInlineContent('mapPreview');
 	}
-	/*public function addNewMapData(){
-		$mapFormParams = array('page' => 'AddMap', 'formId' => 'gmpAddNewMapForm', 'formName' => 'addNewMap');
-		$markerFormParams = array('page' => 'AddMap', 'formId' => 'gmpAddMarkerToNewForm', 'formNmae'=>'addMarkerForm');
-		$markerForm = frameGmp::_()->getModule('marker')->getController()->getMarkerForm($markerFormParams );
-		$mapForm=$this->getMapForm($mapFormParams);
-		$this->assign('mapForm', $mapForm);
-		$this->assign('markerForm', $markerForm);
-		return parent::getContent('addMap');
-	}*/
 	public function editMaps(){
 		$mapFormParams = array('formId' => 'gmpEditMapForm', 'formName' => 'editMap', 'page' => 'editMap');
 		$mapForm = $this->getMapForm($mapFormParams);

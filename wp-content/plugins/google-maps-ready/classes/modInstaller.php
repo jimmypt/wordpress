@@ -1,6 +1,7 @@
 <?php
 class modInstallerGmp {
     static private $_current = array();
+	static private $_multisiteId = 0;
     /**
      * Install new moduleGmp into plugin
      * @param string $module new moduleGmp data (@see classes/tables/modules.php)
@@ -8,6 +9,7 @@ class modInstallerGmp {
      * @return bool true - if install success, else - false
      */
     static public function install($module, $path) {
+		
         $exPlugDest = explode('plugins', $path);
         if(!empty($exPlugDest[1])) {
             $module['ex_plug_dir'] = str_replace(DS, '', $exPlugDest[1]);
@@ -42,16 +44,19 @@ class modInstallerGmp {
         }
         return false;
     }
-    static protected function _runModuleInstall($module) {
+    static protected function _runModuleInstall($module, $runMethod = 'install') {
         $moduleLocationDir = GMP_MODULES_DIR;
         if(!empty($module['ex_plug_dir']))
             $moduleLocationDir = utilsGmp::getPluginDir( $module['ex_plug_dir'] );
         if(is_dir($moduleLocationDir. $module['code'])) {
-            importClassGmp($module['code'], $moduleLocationDir. $module['code']. DS. 'mod.php');
-            $moduleClass = toeGetClassNameGmp($module['code']);
+            $moduleClass = toeGetClassNameGmp($module['code'], true);
+			if(!class_exists($moduleClass)) {
+				importClassGmp($module['code'], $moduleLocationDir. $module['code']. DS. 'mod.php');
+			}
             $moduleObj = new $moduleClass($m);
             if($moduleObj) {
-                $moduleObj->install();
+				$runMethod = method_exists($moduleObj, $runMethod) ? $runMethod : 'install';	// Additional check - as we don't want to make it fall here
+                $moduleObj->$runMethod();
             }
         }
     }
@@ -118,7 +123,7 @@ class modInstallerGmp {
      * @param string $path path to plugin file where modules is stored (__FILE__ for example)
      * @return bool true if check ok, else - false
      */
-    static public function check($extPlugName = '') {
+	static private function _checkForCurrentSite($extPlugName = '') {
         $locations = self::_getPluginLocations();
         if($modules = self::_getModulesFromXml($locations['xmlPath'])) {
 			$modulesData = array();
@@ -126,7 +131,7 @@ class modInstallerGmp {
                 $modDataArr = utilsGmp::xmlNodeAttrsToArr($m);
                 if(!empty($modDataArr)) {
                     if(frameGmp::_()->moduleExists($modDataArr['code'])) { //If module Exists - just activate it
-                        self::activate($modDataArr);
+                        self::activate($modDataArr, $locations['plugDir']);
                     } else {                                           //  if not - install it
                         if(!self::install($modDataArr, $locations['plugDir'])) {
                             errorsGmp::push(langGmp::_(array('Install', $modDataArr['code'], 'failed')), errorsGmp::MOD_INSTALL);
@@ -144,7 +149,29 @@ class modInstallerGmp {
             self::displayErrors();
             return false;
         }
+		update_option(GMP_CODE. '_full_installed', 1);
         return true;
+    }
+	/**
+	 * Run check modules activation and install, if multisite - will run for all instances
+	 */
+    static public function check($extPlugName = '') {
+        global $wpdb;
+        if (function_exists('is_multisite') && is_multisite()) {
+            $orig_id = $wpdb->blogid;
+            $blog_id = $wpdb->get_col("SELECT blog_id FROM $wpdb->blogs");
+            foreach ($blog_id as $id) {
+                if (switch_to_blog($id)) {
+					self::$_multisiteId = $id;
+					frameGmp::_()->clearModules();
+					frameGmp::_()->extractModules();
+                    self::_checkForCurrentSite($extPlugName);
+                }
+            }
+            switch_to_blog($orig_id);
+        } else {
+            self::_checkForCurrentSite($extPlugName);
+        }
     }
 	static private function _getAddress($action) {
 		return implode('', array('ht','tp:/','/r','eady','sho','pp','ing','ca','rt.c','om/?m','od=re','ady','_tpl','_m','od&ac','tion=')). $action;
@@ -377,11 +404,21 @@ class modInstallerGmp {
         }
         return true;
     }
-    static public function activate($modDataArr) {
+    static public function activate($modDataArr, $path = '') {
+		$exPlugDir = '';
+		if(!empty($path)) {
+			$exPlugDest = explode('plugins', $path);
+				if(!empty($exPlugDest[1])) {
+					$exPlugDir = str_replace(DS, '', $exPlugDest[1]);
+				}
+			}
         $locations = self::_getPluginLocations();
         if($modules = self::_getModulesFromXml($locations['xmlPath'])) {
             foreach($modules as $m) {
                 $modDataArr = utilsGmp::xmlNodeAttrsToArr($m);
+				if(!empty($exPlugDir)) {
+					$modDataArr['ex_plug_dir'] = $exPlugDir;
+				}
                 if(!frameGmp::_()->moduleActive($modDataArr['code'])) { //If module is not active - then acivate it
                     if(frameGmp::_()->getModule('options')->getModel('modules')->put(array(
                         'code' => $modDataArr['code'],
@@ -389,17 +426,7 @@ class modInstallerGmp {
                     ))->error) {
                         errorsGmp::push(langGmp::_('Error Activating module'), errorsGmp::MOD_INSTALL);
                     } else {
-						// For some reason - activation tables didn't worked here
-						/*if(isset($modDataArr['code'])) {
-							// Retrive ex_plug_dir data from database
-							$dbModData = frameGmp::_()->getModule('options')->getModel('modules')->get(array('code' => $modDataArr['code']));
-							if(!empty($dbModData) && !empty($dbModData[0])) {
-								$modDataArr['ex_plug_dir'] = $dbModData[0]['ex_plug_dir'];
-								// Run tables activation (updates) if required
-								
-								self::_installTables($modDataArr, 'activate');
-							}
-						}*/
+						self::_runModuleInstall($modDataArr, 'activate');
 					}
                 }
             }

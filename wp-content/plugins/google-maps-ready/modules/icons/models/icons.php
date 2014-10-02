@@ -12,14 +12,14 @@ class iconsModelGmp extends modelGmp {
 		}
 	}
     public function getIcons(){
-        $icons =  frameGmp::_()->getTable('icons')->get('*');
-        if( empty($icons) ){
-              return $icons ;
+        $icons = frameGmp::_()->getTable('icons')->get('*');
+        if(empty($icons) ){
+			return $icons ;
         }
-        $iconsArr=array();
+        $iconsArr = array();
         foreach($icons as $icon){
             $icon['path'] = $this->getIconUrl($icon['path']);
-            $iconsArr[$icon['id']]=$icon;
+            $iconsArr[$icon['id']] = $icon;
         }
         return $iconsArr;
     }

@@ -21,21 +21,22 @@ class optionsViewGmp extends viewGmp {
 		);
 		$tabsData = dispatcherGmp::applyFilters('adminOptionsTabs', $tabsData);
 		
-		$indoWindowSize  = utilsGmp::unserialize($this->getModel('options')->get('infowindow_size'));
 		$defaultOpenTab = reqGmp::getVar('tab', 'get');
 
+		frameGmp::_()->addScript('admin.settings', $this->getModule()->getModPath(). 'js/admin.settings.js');
+		
+		$this->assign('indoWindowSize', $this->getModel()->get('infowindow_size'));
 		$this->assign('tabsData', $tabsData);
-		$this->assign('indoWindowSize', $indoWindowSize);
 		$this->assign('defaultOpenTab', $defaultOpenTab);
 		parent::display('optionsAdminPage');
 	}
 	
 	public function getPluginSettingsTab() {
-		$saveStatistic = $this->getModel('options')->getStatisticStatus();
-		$indoWindowSize  = utilsGmp::unserialize($this->getModel('options')->get('infowindow_size'));
-		$this->assign('saveStatistic', $saveStatistic);
-		$this->assign('indoWindowSize', $indoWindowSize);
+		$optModel = $this->getModel();
+		$this->assign('indoWindowSize', $this->getModel()->get('infowindow_size'));
+		$this->assign('additionalOptions', dispatcherGmp::applyFilters('additionalOptions', array()));
 		$this->assign('additionalGlobalSettings', dispatcherGmp::applyFilters('additionalGlobalSettings', array()));
+		$this->assign('optModel', $optModel);
 		return parent::getContent('settingsTab');
 	}
 	public function getMarkersGroupsTab(){

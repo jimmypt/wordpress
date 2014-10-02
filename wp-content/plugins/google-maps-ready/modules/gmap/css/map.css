@@ -20,8 +20,8 @@
     background-color: rgba(255, 255, 255, 0.49);
 }
 .map-preview-iumg-container img {
-    width: 175px;
-    cursor:pointer;
+    /*width: 175px;*/
+    cursor: pointer;
 }
 .gmp_map_opts {
     float: left;

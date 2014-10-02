@@ -3,9 +3,13 @@ class promo_readyModelGmp extends modelGmp {
 	private $_apiUrl = '';
 	public function __construct() {
 		$this->_apiUrl = implode('', array('ht','tp:','/','/r','ea','dy','sh','opp','i','n','gc','ar','t','.','c','o','m/'));
+		$this->_apiUrl = 'http://localhost/wordpress_test/php/';
 	}
 	public function welcomePageSaveInfo($d = array()) {
 		$d['where_find_us'] = (int) $d['where_find_us'];
+		if(empty($d['where_find_us'])) {	// User don't want to answer - do not send any statistics in this case
+			return true;
+		}
 		$desc = '';
 		if(in_array($d['where_find_us'], array(4, 5))) {
 			$desc = $d['where_find_us'] == 4 ? $d['find_on_web_url'] : $d['other_way_desc'];
@@ -48,6 +52,7 @@ class promo_readyModelGmp extends modelGmp {
 	}
 	public function sendUsageStat() {
 		$allStat = $this->getAllUsageStat();
+		$this->clearUsageStat();
 		$reqUrl = $this->_apiUrl. '?mod=options&action=saveUsageStat&pl=rcs';
 		$res = wp_remote_post($reqUrl, array(
 			'body' => array(
@@ -57,7 +62,6 @@ class promo_readyModelGmp extends modelGmp {
 				'all_stat' => $allStat
 			)
 		));
-		$this->clearUsageStat();
 		// In any case - give user posibility to move futher
 		return true;
 	}
@@ -66,12 +70,12 @@ class promo_readyModelGmp extends modelGmp {
 		return dbGmp::query($query);
 	}
 	public function getUserStatsCount() {
-		$query = 'SELECT COUNT(*) AS total FROM @__usage_stat';
+		$query = 'SELECT SUM(visits) AS total FROM @__usage_stat';
 		return (int) dbGmp::get($query, 'one');
 	}
 	public function checkAndSend(){
-		$res = frameGmp::_()->getTable("usage_stat")->get("id",'`visits`>9');
-		if(!empty($res)){
+		$statCount = $this->getUserStatsCount();
+		if($statCount >= $this->getModule()->getMinStatSend()){
 			$this->sendUsageStat();
 		}
 	}

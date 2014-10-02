@@ -72,6 +72,7 @@ abstract class tableGmp {
     }
     public function arbitraryJoin($join) {
         $this->_join[] = $join;
+		return $this;
     }
     public function haveField($field) {
         return isset($this->_fields[$field]);
@@ -208,6 +209,7 @@ abstract class tableGmp {
             $group = $fields;
         }
         $this->_group = $group;
+		return $this;
     }
     public function get($fields = '*', $where = '', $tables = '', $return = 'all') {
         if(!$tables) $tables = $this->_table. ' '. $this->_alias;

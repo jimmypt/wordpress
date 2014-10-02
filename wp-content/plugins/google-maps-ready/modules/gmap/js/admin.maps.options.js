@@ -11,7 +11,7 @@ var markersToSend = {};
 var gmpDropDownObj = {};
 var gmpMapEditing = false;
 var gmpMapForEdit;
-var gmpCurrentMarkerForm = jQuery("#gmpAddMarkerToNewForm");
+var gmpCurrentMarkerForm = jQuery("#gmpAddMarkerToEditMap");
 var gmpAddMapForm;
 var gmpEditMapForm;
 var gmpIsMapEditing = {
@@ -64,17 +64,17 @@ var gmpAdminOpts ={
 		}
 		return res;
 	},
-	getMarkerFormData:function(formId){
+	/*getMarkerFormData:function(formId){
 		
 		var data = this.getFormData(formId);
 		
 	
 		var markerParams = {
-			title	 	: data.gmpMarkerTitleOpt,
-			desc	  	: data.description,
-			group_id 	: data.gmpMarkerGroupOpt,
-			animation	: data.marker_optsanimation,
-			address		: data.gmpMarkerAddressOpt
+			title	 	: data.gmpMarkerTitleOpt
+		,	desc	  	: data.description
+		,	group_id 	: data.gmpMarkerGroupOpt
+		,	animation	: data.marker_optsanimation
+		,	address		: data.gmpMarkerAddressOpt
  	
 		};
 		markerParams.titleLink={
@@ -95,7 +95,7 @@ var gmpAdminOpts ={
 				 }
 		}
 		return markerParams;
-	},
+	},*/
 	prepareMarkerDataToSet:function(data,type){
 		if(type=="map_form"){
 		}else{
@@ -408,9 +408,9 @@ function getInfoWindow(title, content, markerItem) {
 
 function gmpGetRandomid(){
 	var num = Math.random();
-	num=""+num;
-	var rand=num.substr(10);
-	return 'id'+rand;
+	num = ''+ num;
+	var rand = num.substr(10);
+	return 'id'+ rand;
 }
 
 function gmpDrawMap(params) {
@@ -523,6 +523,8 @@ function gmpEditMap(mapId) {
 					});
 				}
 			}
+			gmpMapIdShow(mapId);
+			gmpDoAction('afterMapOpen', mapId, mapData);
 		}
 	}
 	return;
@@ -561,7 +563,9 @@ function gmpSaveEditedMap() {
 				getMapsList();
 				if(res.data && res.data.map_id) {
 					jQuery('#gmpEditMapForm').find('[name="map_opts[id]"]').val( res.data.map_id );
+					gmpMapIdShow( res.data.map_id );
 				}
+				gmpDoAction('afterMapSave', jQuery('#gmpEditMapForm').find('[name="map_opts[id]"]').val());
 			}
 		}
 	});
@@ -615,12 +619,21 @@ function drawMarker(params, opts) {
 	var iconId;
 	var mIcon;
 	var iconObj = typeof(params.icon) == 'object' ? params.icon : typeof(params.icon_data) == 'object' ? params.icon_data : null;
-	if(iconObj) {
+	if(iconObj && iconObj.path && iconObj.path != '') {
 		mIcon = iconObj.path;
 		iconId = iconObj.id;
 	} else {
-		mIcon = gmpExistsIcons[gmpCurrentIcon].path;   
-		iconId = gmpCurrentIcon;
+		var defIcon = {};	// Default icon
+		if(gmpCurrentIcon && gmpExistsIcons[gmpCurrentIcon]) {
+			defIcon = gmpExistsIcons[gmpCurrentIcon];
+		} else {
+			for(var i in gmpExistsIcons) {
+				defIcon = gmpExistsIcons[i];
+				break;
+			}
+		}
+		mIcon = defIcon.path;   
+		iconId = defIcon.id;
 	}
 	var markerIcon = {
 		url: mIcon
@@ -649,10 +662,11 @@ function drawMarker(params, opts) {
 	} else {
 	   var randId = params.id;
 	}
-	var animType = 2;
-	if(params.animation == 1){
+	params.animation = parseInt(params.animation);
+	//var animType = parseInt(params.animation);
+	/*if(params.animation == 1){
 		 animType = 1;
-	}
+	}*/
 	markerItem = jQuery.extend(params, {
 		title: markerTitle
 	,	description: markerDesc
@@ -661,7 +675,7 @@ function drawMarker(params, opts) {
 	,	coord_x: markerLatLng.lng()
 	,	icon: iconId
 	,	groupId: params.group_id
-	,	animation: animType
+	,	animation: params.animation
 	});
 	if(params.address != 'undefined') {
 		markerItem.address = params.address; 
@@ -678,7 +692,7 @@ function drawMarker(params, opts) {
 	,	map: currentMap
 	,	title: markerTitle
 	,	zIndex: 99999999
-	,	animation: animType
+	,	animation: params.animation
 	,	id: randId
 	});
 	if(typeof(params.address) == 'undefined' ||  params.address == '') {
@@ -697,6 +711,11 @@ function drawMarker(params, opts) {
 		content: getInfoWindow(markerTitle, markerDesc, markerItem)
 	,	markerId: randId
 	});
+	/*google.maps.event.addListener(infoWindows[randId], 'domready', function(){
+		gmpAdjustCloseBtnInfoPos(this, {
+			checkScrollContent: true
+		});
+	});*/
 	google.maps.event.addListener(markerArr[randId].markerObj, 'click', function(){
 		for(var i in infoWindows) {
 			if(typeof(infoWindows[i].close) != 'undefined') {
@@ -717,16 +736,19 @@ function drawMarker(params, opts) {
 		}
 		currentMap.fitBounds (bounds);
 	}
+	if(opts.setMapCenter) {
+		currentMap.setCenter( markerArr[randId].markerObj.position );
+	}
 	if(currentMap.getZoom() > 19){
 		currentMap.setZoom(18);
 	}
 	if(gmpAddMapForm.is(':visible')){
-	   gmpAddMapForm.find('.gmpMap_zoom').val(currentMap.getZoom())				
+	   gmpAddMapForm.find('.gmpMap_zoom').val(currentMap.getZoom());			
 	}
 	if(gmpEditMapForm.is(':visible')){
-	   gmpEditMapForm.find('.gmpMap_zoom').val(currentMap.getZoom())				
+	   gmpEditMapForm.find('.gmpMap_zoom').val(currentMap.getZoom());				
 	}
-	if(typeof(params.address) == 'undefined' ||  params.address == ''){
+	if(typeof(params.address) == 'undefined' || params.address == '') {
 		getGmapMarkerAddress({
 			coord_x: markerItem.coord_x
 		,	coord_y: markerItem.coord_y
@@ -780,134 +802,16 @@ function editMarker(marker){
 		jQuery('#marker_optsparamsmore_info_link_check').removeAttr('checked').trigger('change');
 	}
 	jQuery('.removeMarkerFromForm').removeAttr('disabled');
+	gmpDoAction('afterMarkerOpen', marker.id);
 	return;
-	/*var mapForm	  = jQuery("#gmpAddNewMapForm");
-	var markerForm   = jQuery("#gmpAddMarkerToNewForm");
-	var markerFormId = "gmpAddMarkerToNewForm";
-	if(gmpMapEditing){
-		mapForm	 =   jQuery("#gmpEditMapForm");
-		markerForm  =   jQuery("#gmpAddMarkerToEditMap");
-		markerFormId = "gmpAddMarkerToEditMap";
-	}
-           
-        markerForm = gmpCurrentMarkerForm;
-	gmpAdminOpts.forms[markerFormId].setFormData(marker);
-
-	var removeBtn = markerForm.parents(".tab-pane.active").find(".removeMarkerFromForm");
-        
-        if(typeof(removeBtn)!='undefined'){
-		removeBtn.attr('marker_id',marker.id);
-	}
-	markerForm.find("#gmpEditedMarkerLocalId").val(marker.id);*/
-//	markerForm.find(".gmpEditMarkerOpts").find("#gmpEditedMarkerLocalId").val(marker.id);
 }
-
-/*jQuery('#gmpMapHtmlOpts').submit(function(){
-	gmpNewMapOpts.width	 =   jQuery(this).find('#gmpNewMap_width').val();
-	gmpNewMapOpts.height	=   jQuery(this).find('#gmpNewMap_height').val();	
-	gmpNewMapOpts.classname =   jQuery(this).find('#gmpNewMapClassname').val();
-	gmpNewMapOpts.title	 =   jQuery(this).find('#gmpNewMap_title').val();
-	gmpNewMapOpts.desc	 =   jQuery(this).find('#gmpNewMap_description').val();
-	jQuery('.gmpOptsCon').hide(300);
-	return false;
-});*/
 var newShortcodePreview;
 jQuery("#gmpSaveNewMap").click(function(){
 	jQuery("#gmpAddNewMapForm").trigger("submit");	
 });
 jQuery("#gmpSaveEditedMap.gmpSaveEditedMapBtn").click(function(){
-	//var map_id = jQuery(this).attr('current_map_id');
 	gmpSaveEditedMap();
 });
-/*function getMapPropertiesFromForm(formObj){
-	   if(formObj==undefined){
-		   formObj=jQuery("#gmpAddNewMapForm");
-		   var zoomId = "#map_optsenable_zoom_check";
-		   var zoomMouseId = "#map_optsenable_mouse_zoom_check";
-		   
-	   } else{
-		   var zoomId = "#map_optsenable_zoom_em_text";
-		   var zoomMouseId = "#map_optsenable_mouse_zoom_em_text";		   
-	   }
-	 var gmpNewMapOpts={
-				title			   :   formObj.find("#gmpNewMap_title").val(),
-				desc				:   formObj.find("#gmpNewMap_description").val(),
-				width			   :   formObj.find("#gmpNewMap_width").val(),
-				height			  :   formObj.find("#gmpNewMap_height").val(),
-				zoom				:   formObj.find("#gmpMap_zoom").val(),
-				type				:   formObj.find("#gmpMap_type").val(),
-				language			:   formObj.find("#gmpMap_language").val(),
-				align			   :   formObj.find("#gmpMap_align").val(),
-				margin			  :   formObj.find("#gmpNewMap_margin").val(),
-				border_color		:   formObj.find(".map_border_color").val(),
-				border_width		:   formObj.find("#gmpNewMap_border_width").val(),
-	}
-	
-	if(formObj.attr('id')=="gmpAddNewMapForm"){
-		gmpNewMapOpts.enable_zoom		 =   formObj.find("#map_optsenable_zoom_text").val();
-		gmpNewMapOpts.enable_mouse_zoom   =   formObj.find("#map_optsenable_mouse_zoom_text").val();	   
-	}else{
-		gmpNewMapOpts.enable_zoom		 =   formObj.find("#map_optsenable_zoom_em_text").val();
-		gmpNewMapOpts.enable_mouse_zoom   =   formObj.find("#map_optsenable_mouse_zoom_em_text").val();	   
-	}
-	
-	
-	gmpNewMapOpts.map_center={
-			   coord_x:currentMap.getCenter().lng(),
-			   coord_y:currentMap.getCenter().lat(),
-	};			 
-	gmpNewMapOpts['map_display_mode']="map";
-	return gmpNewMapOpts;
-}*/
-/*jQuery("#gmpAddNewMapForm").submit(function(){
-    
-        
-        
-        var params = gmpAdminOpts.getFormData("gmpAddNewMapForm");
-		var converted = gmpAdminOpts.convertKeys(params);
-
-		converted.map_center={
-				   coord_x:currentMap.getCenter().lng(),
-				   coord_y:currentMap.getCenter().lat(),
-		};			 
-		converted['map_display_mode']="map";
-
-	   if(converted.title=="" || converted.title.length<3){
-			jQuery("#gmpTabForNewMapOpts").trigger('click');
-			jQuery("#gmpNewMap_title").css('border','1px solid red')
-			alert("Map Title must be at least 3 chars");
-			return false;
-		}
-	gmpClearMap();
-	var sendData={
-		markers:markerArr,
-		mapOpts:converted,
-		mod	:'gmap',
-		action :'saveNewMap',
-		reqType:'ajax'
-	}
-
-	jQuery.sendFormGmp({
-		msgElID: 'gmpNewMapMsg'
-	,	data:sendData
-	,	onSuccess: function(res) {
-			if(!res.error){
-				var newShortcodePreview  = "<pre class='gmpPre'>";
-				newShortcodePreview += "<h3>New Shortcode</h3>";
-				newShortcodePreview += "<h5>Paste this shortcode to preview created map in site</h5>";
-				newShortcodePreview +=" [ready_google_map id='"+res.data.map_id+"']";
-				newShortcodePreview += "</div></pre>";
-				getMapsList({
-					'id': res.data.map_id
-				});
-				gmpRefreshMarkerList();
-				clearAddNewMapData();
-			}
-		}
-	});
-	return false;
-});*/
-
 function clearMarkerForm(markerForm){
 	if(markerForm === undefined) {
 		markerForm = jQuery('#gmpAddMarkerToNewForm');
@@ -927,11 +831,6 @@ function clearMarkerForm(markerForm){
 	markerForm.find('.marker_title_link').val('');
 
 	gmpMarkerDescSetContent('');
-	/*try {
-		tinyMCE.activeEditor.setContent(' ');
-	} catch(e) {
-		
-	}*/
 	markerForm.find('#gmp_marker_coord_x').val('');
 	markerForm.find('#gmp_marker_coord_y').val('');
 	markerForm.find('#gmpIconUrlToDown').val('');
@@ -942,51 +841,7 @@ function clearMarkerForm(markerForm){
 	jQuery('.removeMarkerFromForm').attr('disabled', 'disabled');
 	adminFormSavedGmp( markerForm.attr('id') );
 }
-/*function updateMarker(newParams, markerForm, leaveForm){
-	var currentMarker = markerArr[newParams.id];
-	if(typeof(markerForm) == 'undefined') {
-		var markerForm = jQuery('#gmpAddMarkerToNewForm');
-	}
-	if(gmpMapEditing) {
-		markerForm = jQuery('#gmpAddMarkerToEditMap');
-	}
-	if(newParams.animation == 1) {
-		currentMarker.markerObj.animation = google.maps.Animation.BOUNCE;
-	}
-	currentMarker.animation = newParams.animation;
-	for(var i in newParams) {
-		if(typeof(currentMarker.i) != undefined){
-			currentMarker[i] = newParams[i];
-		}
-	}
-	currentMarker.markerObj.setIcon(gmpExistsIcons[currentMarker.icon].path);
-	currentMarker.markerObj.title = currentMarker.title;
-	if(currentMarker.coord_x != '' && currentMarker.coord_y != '') {
-		currentMarker.markerObj.setPosition(new google.maps.LatLng(currentMarker.coord_y, currentMarker.coord_x));
-	}
-	markerArr[newParams.id] = currentMarker;
-	for(var i in infoWindows) {
-		if(newParams.id == infoWindows[i]['markerId']) {
-			infoWindows[i].setContent(getInfoWindow(newParams.title,newParams.desc, newParams.titleLink));
-		}
-	}
-	if(typeof(leaveForm) == 'undefined') {
-		markerForm.find('#gmpEditedMarkerLocalId').val('');
-		clearMarkerForm(markerForm);
-		markerForm.find('.gmpEditMarkerOpts').hide();
-		markerForm.find('.gmpAddMarkerOpts').show();
-	}
-	var bounds = new google.maps.LatLngBounds();
-	for(var i in markerArr) {
-		var mLatLng = new google.maps.LatLng(markerArr[i].coord_y, markerArr[i].coord_x);
-		bounds.extend(mLatLng);	   
-	}
-	currentMap.fitBounds(bounds);
-	if(currentMap.getZoom() > 19) {
-		currentMap.setZoom(18);
-	}
-}*/
-function afterMarkerFormSubmit(formId) {
+/*function afterMarkerFormSubmit(formId) {
 	var markerParams = gmpAdminOpts.getMarkerFormData(formId);
 	if(markerParams.title.length < 3){
 		alert('Marker Title must be at 3 character at least');
@@ -996,10 +851,10 @@ function afterMarkerFormSubmit(formId) {
 	clearMarkerForm(jQuery("form#"+formId));
 	var markerId = drawMarker(markerParams);
 	return markerId;
-}
+}*/
 jQuery(document).ready(function() {
 	getMapsList();
-	gmpAdminOpts.construct();
+	//gmpAdminOpts.construct();
 	gmpAddMapForm = jQuery('#gmpAddNewMapForm');
 	gmpEditMapForm = jQuery('#gmpEditMapForm');
 	datatables.createDatatables();
@@ -1011,22 +866,6 @@ jQuery(document).ready(function() {
 			jQuery('#gmpHideNewMapPreview').html('Show Map Preview');
 		}
 	});
-	/*jQuery('#gmpAddMarkerToNewForm').submit(function(){
-		var edit_marker_id = jQuery(this).find("#gmpEditedMarkerLocalId").val();
-		if(typeof(edit_marker_id) != 'undefined' && edit_marker_id != ''){
-			var markerNewParams = gmpAdminOpts.getMarkerFormData('gmpAddMarkerToNewForm');
-			markerNewParams.id = edit_marker_id;
-			if(markerNewParams.title == ''){
-				alert('Marker title cannot be blank');
-				jQuery('.gmpMarkerTitleOpt').focus();
-				return false;
-			}
-			updateMarker(markerNewParams);
-		} else {
-			afterMarkerFormSubmit('gmpAddMarkerToNewForm');
-		}
-		return false;
-	});*/
 	jQuery('#gmpAddMarkerToEditMap').submit(function(){
 		// For new markers, that are created from add/edit map form, we should set this value to current editable map ID
 		if(!parseInt(jQuery(this).find('[name="marker_opts[map_id]"]').val())) {
@@ -1049,9 +888,13 @@ jQuery(document).ready(function() {
 				if(!res.error) {
 					if(res.data.marker) {
 						gmpRefreshMarkerList();
-						gmpAddMarkerToMapMarkersTable(res.data.marker, res.data.update);
+						gmpAddMarkerToMapMarkersTable(res.data.marker, res.data.update, {
+							ignoreFitMap: true
+						,	setMapCenter: true
+						});
 						jQuery('#gmpAddMarkerToEditMap').find('[name="marker_opts[id]"]').val( res.data.marker.id );
 						jQuery('.removeMarkerFromForm').removeAttr('disabled');
+						gmpDoAction('afterMarkerSave', res.data.marker.id, res.data.marker);
 					}
 				}
 			}
@@ -1063,54 +906,24 @@ jQuery(document).ready(function() {
 		jQuery('#gmpAddMarkerToEditMap').submit();
 	});
 	jQuery('.gmpCancelMarkerEditing').click(function(){
-		var parentForm = gmpAdminOpts.forms.gmpEditMarkerForm.formObj;
-		clearMarkerForm(parentForm);
-		parentForm.find('#gmpEditedMarkerLocalId').val('');
+		var parentForm = gmpAdminOpts.forms.gmpEditMarkerForm ? gmpAdminOpts.forms.gmpEditMarkerForm.formObj : false;
+		if(parentForm) {
+			clearMarkerForm(parentForm);
+			parentForm.find('#gmpEditedMarkerLocalId').val('');
+		}
 		if(jQuery('.gmpMarkerEditForm.markerListConOpts').hasClass('active'))
 			jQuery('.markerListConOpts').toggleClass('active');
 	});
-	
-	/*jQuery('body').on('click', 'li.gmpAutoCompRes', function(){
-		var linkElem = jQuery(this).find('a.autoCompRes');
-		var latlng=linkElem.attr('id').split('__');
-		if(latlng.length < 2){
-			return false;
-		}
-		var selectedAddress = linkElem.text();
-		var currentForm = linkElem.parents('form');
-		currentForm.find('#gmp_marker_coord_x').val(parseFloat(latlng[1]));
-		currentForm.find('#gmp_marker_coord_y').val(parseFloat(latlng[0]));
-		currentForm.find('#gmp_marker_address').val(selectedAddress);
-		jQuery('.gmpAddressAutocomplete').hide();			
-		return false;
-	});
-	jQuery(document).click(function(e) { 
-		if(!jQuery(e.target).is('.gmpAddressAutocomplete')){
-			if(jQuery(e.target).is('.gmp_marker_address')){
-				jQuery('.gmpAddressAutocomplete').toggle();						
-			} else {
-			  jQuery('.gmpAddressAutocomplete').hide();				  
-			}
-		}
-	});*/
 	jQuery('.map_border_color').click(function(){
 		jQuery(this).val() == '' ? jQuery(this).val(' ') : '';
 	});
-   
-   jQuery('.title_is_link').change(function(){
-	   if(this.checked) {
-		   jQuery(this).parents('.gmpFormRow').find('.markerTitleLink_Container').show(100);
-	   } else {
-		   jQuery(this).parents('.gmpFormRow').find('.markerTitleLink_Container').hide(100);		   
-	   }
-   });
-  /* jQuery(".removeMarkerFromForm").click(function(){
-		 var marker= markerArr[jQuery(this).attr('marker_id')];
-		 gmpRemoveMarkerObj(marker,jQuery(this).parents("form"));
-                 clearMarkerForm();
-                 jQuery(this).removeAttr("marker_id");
-   });*/
-   
+	jQuery('.title_is_link').change(function(){
+		if(this.checked) {
+			jQuery(this).parents('.gmpFormRow').find('.markerTitleLink_Container').show(100);
+		} else {
+			jQuery(this).parents('.gmpFormRow').find('.markerTitleLink_Container').hide(100);		   
+		}
+	});
 	jQuery('.gmpMarkerSelectedIconOpt').on('change', function(){
 		setcurrentIconToForm(jQuery(this).val(), jQuery(this).parents('form'));
 	});
@@ -1121,16 +934,15 @@ jQuery(document).ready(function() {
 			jQuery('#gmpSaveNewMap').attr('disabled', 'disabled');		
 		}
 	});
-	jQuery('#gmpEditMapForm input[name="map_opts[title]"]').change(function(){
-		gmpMapNameTitleShow( jQuery(this).val() );
-	}).keyup(function(){
-		gmpMapNameTitleShow( jQuery(this).val() );
-	});
-	
 });
 // Update map name in additional title view
 function gmpMapNameTitleShow(newName) {
 	jQuery('.gmpEditingMapName').html( newName );
+}
+function gmpMapIdShow(newId) {
+	jQuery('.gmpEditingMapId').html( newId );
+	var shortcode = jQuery('.gmpShortCodePreviewForEditMap').html();
+	jQuery('.gmpShortCodePreviewForEditMap').html( shortcode.replace(/='\d*'/, "='"+ newId+ "'") );
 }
 
 function gmpRemoveMap(mapId){
@@ -1302,79 +1114,3 @@ function drawAutocompleteResult(params, form){
 		form.find('.gmpAddressAutocomplete ul').append(item);
 	}
 }
-/*function startSearchAddress(address, form, msgEl, inputEl) {
-
-	if(address.length < 3){
-		return; 
-	}
-	var sendData = {
-		addressStr: address
-	,	mod: 'marker'
-	,	action: 'findAddress'
-	,	reqType:'ajax'
-	};
-	jQuery.sendFormGmp({
-		msgElID: gmpCurrentMarkerForm.find('#gmpAddressLoader')
-	,	data: sendData
-	,	onSuccess: function(res) {
-			if(res.error){
-				jQuery('.gmpFormRow.gmpAddressField .gmpAddrErrors').html(res.errors.join(','));
-				return false;
-			}
-			drawAutocompleteResult(res.data, form);
-		}
-	});
-
-
-	address = jQuery.trim(address);
-	if(address && address != '') {
-		if(typeof(msgEl) === 'string')
-			msgEl = jQuery(msgEl);
-		msgEl.showLoaderGmp();
-		inputEl.autocomplete('option', {
-			source: function(request, response) {
-				var geocoder = gmpGetGeocoder();
-				geocoder.geocode( { 'address': address}, function(results, status) {
-					msgEl.html('');
-					if (status == google.maps.GeocoderStatus.OK && results.length) {
-						var autocomleateData = [];
-						for(var i in results) {
-							autocomleateData.push(results[i].formatted_address);
-						}
-						response(autocomleateData);
-
-						console.log(results.length, results);
-					} else {
-						msgEl.html( toeLangGmp('Google can\'t find requested address coordinates, please try to modify search criterias.') );
-					}
-				});
-			}
-		});
-	}
-}*/
-/*jQuery('.gmpAutocompleteArrow').click(function(){
-	jQuery(this).parents('form').find('.gmpAddressAutocomplete').toggle();
-	if(jQuery(this).hasClass('gmpDown')) {
-		jQuery(this).removeClass('gmpDown');
-		jQuery(this).addClass('gmpUp');
-	} else {
-		jQuery(this).addClass('gmpDown');
-		jQuery(this).removeClass('gmpUp');		
-	}
-});*/
-
-/*function gmpCancelMapEdit(params){
-	clearMarkerForm(jQuery('#gmpAddMarkerToEditMap'));
-	clearMarkerForm();
-	clearAddNewMapData(jQuery('#gmpEditMapForm'));
-	clearAddNewMapData();
-	currentMap = gmpTempMap;
-	gmpMapEditing = false;
-	jQuery('#gmpEditMapsContainer').empty();
-	gmpCurrentMarkerForm = jQuery('#gmpAddMarkerToNewForm');
-	markerArr = {};	
-	if(params != undefined && !params.changeTab) {
-		return true;
-	}
-	//gmpChangeTab(jQuery('.nav.nav-tabs li.gmpAddNewMap a'));
-}*/

@@ -9,7 +9,7 @@ jQuery.fn.nextInArray = function(element) {
     if(nextId > this.length-1)
         nextId = 0;
     return this[nextId];
-}
+};
 jQuery.fn.clearForm = function() {
 	return this.each(function() {
 		var type = this.type, tag = this.tagName.toLowerCase();
@@ -22,13 +22,13 @@ jQuery.fn.clearForm = function() {
 		else if (tag == 'select') 
 			this.selectedIndex = -1;
 	});
-}
+};
 jQuery.fn.tagName = function() {
     return this.get(0).tagName;
-}
+};
 jQuery.fn.exists = function(){
     return (jQuery(this).size() > 0 ? true : false);
-}
+};
 function isNumber(val) {
     return /^\d+/.test(val);
 }
@@ -46,9 +46,14 @@ jQuery.fn.serializeAnything = function(addData) {
             toReturn.push(key + "=" + addData[key]);
     }
     return toReturn.join("&").replace(/%20/g, "+");
-}
- 
-
+};
+jQuery.fn.hasScrollBarH = function() {
+	return this.get(0).scrollHeight > this.height();
+};
+jQuery.fn.hasScrollBarV = function() {
+	console.log(this.get(0).scrollWidth, this.width(), this.get(0).scrollHeight, this.height());
+	return this.get(0).scrollWidth > this.width();
+};
 function str_replace(haystack, needle, replacement) { 
 	var temp = haystack.split(needle); 
 	return temp.join(replacement); 
@@ -338,4 +343,32 @@ function getImgSize(url, callback) {
 	jQuery('<img/>').attr('src', url).load(function(){
 		callback({w: this.width, h: this.height});
 	});
+}
+function callUserFuncArray(cb, parameters) {
+	// http://kevin.vanzonneveld.net
+	// +   original by: Thiago Mata (http://thiagomata.blog.com)
+	// +   revised  by: Jon Hohle
+	// +   improved by: Brett Zamir (http://brett-zamir.me)
+	// +   improved by: Diplom@t (http://difane.com/)
+	// +   improved by: Brett Zamir (http://brett-zamir.me)
+	// *     example 1: call_user_func_array('isNaN', ['a']);
+	// *     returns 1: true
+	// *     example 2: call_user_func_array('isNaN', [1]);
+	// *     returns 2: false
+	var func;
+
+	if (typeof cb === 'string') {
+		func = (typeof this[cb] === 'function') ? this[cb] : func = (new Function(null, 'return ' + cb))();
+	}
+	else if (Object.prototype.toString.call(cb) === '[object Array]') {
+		func = (typeof cb[0] == 'string') ? eval(cb[0] + "['" + cb[1] + "']") : func = cb[0][cb[1]];
+	}
+	else if (typeof cb === 'function') {
+		func = cb;
+	}
+	if (typeof func !== 'function') {
+		throw new Error(func + ' is not a valid function');
+	}
+
+	return (typeof cb[0] === 'string') ? func.apply(eval(cb[0]), parameters) : (typeof cb[0] !== 'object') ? func.apply(null, parameters) : func.apply(cb[0], parameters);
 }

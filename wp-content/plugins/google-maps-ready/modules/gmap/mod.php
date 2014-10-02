@@ -45,4 +45,20 @@ class  gmapGmp extends moduleGmp {
 		}
 		return '[ready_google_map '. implode(' ', $shortcodeParamsArr). ']';
 	}
+	public function getControlsPositions() {
+		return array(
+			'TOP_CENTER' => langGmp::_('Top Center'),
+			'TOP_LEFT' => langGmp::_('Top Left'),
+			'TOP_RIGHT' => langGmp::_('Top Right'),
+			'LEFT_TOP' => langGmp::_('Left Top'),
+			'RIGHT_TOP' => langGmp::_('Right Top'),
+			'LEFT_CENTER' => langGmp::_('Left Center'),
+			'RIGHT_CENTER' => langGmp::_('Right Center'),
+			'LEFT_BOTTOM' => langGmp::_('Left Bottom'),
+			'RIGHT_BOTTOM' => langGmp::_('Right Bottom'),
+			'BOTTOM_CENTER' => langGmp::_('Bottom Center'),
+			'BOTTOM_LEFT' => langGmp::_('Bottom Left'),
+			'BOTTOM_RIGHT' => langGmp::_('Bottom Right'),
+		);
+	}
 }

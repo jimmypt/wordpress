@@ -22,6 +22,9 @@ class htmlGmp {
 		return $txt;
     }
     static public function input($name, $params = array('attrs' => '', 'type' => 'text', 'value' => '')) {
+		$params['type'] = isset($params['type']) ? $params['type'] : '';
+		$params['value'] = isset($params['value']) ? $params['value'] : '';
+		$params['attrs'] = isset($params['attrs']) ? $params['attrs'] : '';
 		$inp =  '<input type="'. $params['type']. '" name="'. $name. '" value="'. $params['value']. '" '. $params['attrs'].' />';
 		if(isset($params['hint'])){
 			$inp .= "<label  class='hiddenLabelHint'>".$params['hint']."</label>";
@@ -46,11 +49,11 @@ class htmlGmp {
     }
     static public function checkbox($name, $params = array('attrs' => '', 'value' => '', 'checked' => '')) {
         $params['type'] = 'checkbox';
-        if($params['checked'])
+        if(isset($params['checked']) && $params['checked'])
             $params['checked'] = 'checked';
 		else
 			$params['checked'] = '';
-        if($params['value'] === NULL)
+        if(!isset($params['value']) || $params['value'] === NULL)
             $params['value'] = 1;
         $params['attrs'] .= ' '.$params['checked'];
         return self::input($name, $params);
@@ -171,9 +174,11 @@ class htmlGmp {
         $out = '';
         if(strpos($params['url'], 'pl='. GMP_CODE) === false)
 			$params['url'] = uriGmp::_(array('baseUrl' => $params['url'], 'pl' => GMP_CODE));
-        $out .= self::button(array('value' => langGmp::_( empty($params['buttonName']) ? 'Upload' :  $params['buttonName'] ), 'attrs' => 'id="toeUploadbut_'.$name.'" class=" '.(isset($params['btn_class'])?$params['btn_class']:" button btn button-large ").'"'));
+        $out .= self::button(array(
+			'value' => langGmp::_( empty($params['buttonName']) ? 'Upload' :  $params['buttonName'] ), 
+			'attrs' => 'id="toeUploadbut_'.$name.'" class=" '. (isset($params['btn_class']) ? $params['btn_class'] : " button btn button-large ").'"'));
         $display = (empty($params['value']) ? 'style="display: none;"' : '');
-        if($params['preview'])
+        if(isset($params['preview']) && $params['preview'])
             $out .= self::img($params['value'], 0, array('attrs' => 'id="prev_'.$name.'" '.$display.' class="previewpicture"'));
         $out .= '<span class="delete_option" id="delete_'.$name.'" '.$display.'></span>';
         $out .= '<script type="text/javascript">// <!--

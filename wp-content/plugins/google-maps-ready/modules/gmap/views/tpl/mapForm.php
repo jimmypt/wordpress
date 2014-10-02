@@ -9,18 +9,6 @@
 			<?php langGmp::_e('Map Name')?>
 		</label>
 	</div>
-	
-	<?php /*?><div class="gmpFormRow">
-		<label for="gmpNewMap_description" class="gmpFormLabel">
-			<?php langGmp::_e('Map Description')?>
-		</label>
-		<div class="gmpFormElemCon">
-		<?php
-			echo htmlGmp::textarea('map_opts[description]', array(
-				'attrs' => " class=' gmpMapDescOpts gmpHintElem' id='gmpNewMap_description' ",
-				'hint' => langGmp::_('Description For Map')));?>
-		</div>
-	</div><?php */?>
 	<div class="gmpFormRow">
 		<div class="gmpFormElemCon">
 		<?php
@@ -58,12 +46,6 @@
 	<div class="gmpFormRow">
 		<div class="gmpFormElemCon">
 		<?php
-			/*$zoomEnableParams =	array('checked'=>'1',
-					 'attrs' => " class='gmpHintElem gmpMapEnableZoomOpts' ",
-					 'hint'=>langGmp::_("Enable Zoom Control In Map"));
-		 if($this->params['formId']=="gmpAddNewMapForm"){
-			 $zoomEnableParams["specSelector"] = "gmpMapEnableZoomOpts";
-		 } */
 			echo htmlGmp::checkboxHiddenVal('map_opts[enable_zoom]', array(
 				'checked' => '1',
 				'attrs' => " class='gmpHintElem gmpMapEnableZoomOpts' ",
@@ -74,71 +56,87 @@
 			  <?php langGmp::_e('Enable Zoom/Control  Panel')?>
 		</label>
 	</div>
-	<div class='gmpFormRow'>
-		<div class='gmpFormElemCon'>
-	   <?php
-		 echo htmlGmp::checkboxHiddenVal('map_opts[enable_mouse_zoom]', array('checked'=>'1','attrs'=>" class='gmpHintElem gmpMapEnableMouseZoomOpts' ","hint"=>langGmp::_("Enable Mouse Zoom In Map"),
-		 "specSelector"=>"gmpMapEnableMouseZoomOpts",
-		 "isSecForm"=>(bool)($this->params['formId'] != "gmpAddNewMapForm")));
-
-	   ?>
+	<div class="gmpFormRow">
+		<div class="gmpFormElemCon">
+			<?php
+			  echo htmlGmp::checkboxHiddenVal('map_opts[enable_mouse_zoom]', array(
+					'checked' => '1',
+					'attrs' => 'class="gmpHintElem gmpMapEnableMouseZoomOpts"',
+					'hint' => langGmp::_('Enable Mouse Zoom In Map'),
+				));
+			?>
 		</div>
-	   <label for="map_optsenable_mouse_zoom_check" class="gmpFormLabel">
-			 <?php langGmp::_e('Enable Mouse Zoom/Control  Panel')?>
-	   </label>
+		<label for="map_optsenable_mouse_zoom_check" class="gmpFormLabel">
+			<?php langGmp::_e('Enable Mouse Zoom/Control Panel')?>
+		</label>
 	</div>
-	   <div class='gmpFormRow'>
-			<div class='gmpFormElemCon'>
-		   <?php
-				echo htmlGmp::selectbox('map_opts[zoom]',
-						array('attrs'=>" class='gmpMap_zoom gmpMapZoomOpts gmpInputSmall gmpHintElem' id='gmpMap_zoom' ",
-							'options'=>$this->map_opts['zoom'],'value'=>1,
-							"hint"=>langGmp::_("Default Zoom For Map")))
-		   ?>
-		   </div>
-		   <label for="gmpMap_zoom" class="gmpFormLabel">
-				 <?php langGmp::_e('Map Zoom Level')?>
-		   </label>
-	   </div>
-	   <div class='gmpFormRow'>
-		   <div class='gmpFormElemCon'>
-		   <?php
-			echo htmlGmp::selectbox('map_opts[type]',
-					array('attrs' => 'class="gmpMap_type gmpInputSmall gmpMapTypeOpt gmpHintElem" id="gmpMap_type"',
-						'options' => $this->map_opts['type'],
-						'hint' => langGmp::_('Select Map Display Mode')));
-		   ?>
-			</div>
-			<label for="gmpMap_type" class="gmpFormLabel">
-				 <?php langGmp::_e('Map Type')?>
-		   </label>
-	   </div>
-	   <div class='gmpFormRow'>
-			<div class='gmpFormElemCon'>
-			   <?php
-					echo htmlGmp::selectbox('map_opts[language]', array(
-						'attrs' => 'class="gmpMap_language gmpInputSmall gmpMapLngOpt gmpHintElem" id="gmpMap_language"',
-						'options' => $this->map_opts['language'],
-						'value' => 'en',
-						'hint' => langGmp::_('Select Map Display Language')));
-			   ?>
-			   </div>
-		   <label for="gmpMap_language" class="gmpFormLabel">
-					 <?php langGmp::_e('Map Language')?>
-		   </label>
-		   </div>
-	   <div class='gmpFormRow'>
-			<div class='gmpFormElemCon'>
-		   <?php
-				echo htmlGmp::selectbox('map_opts[align]',
-						array('attrs'=>" class='gmpInputSmall gmpMapAlignOpt gmpHintElem' id='gmpMap_align' ",
-							'options'=>$this->map_opts['align'],"hint"=>langGmp::_("Map Align")));
-		   ?>
-		   </div>
-		   <label for="gmpMap_align" class="gmpFormLabel">
-				 <?php langGmp::_e('Map Align')?>
-		   </label>
-	   </div>
+	<div class="gmpFormRow">
+		<div class="gmpFormElemCon">
+			<?php
+				echo htmlGmp::checkboxHiddenVal('map_opts[infowindow_on_mouseover]', array(
+					'checked' => '0',
+					'attrs' => 'class="gmpHintElem"',
+					'hint' => langGmp::_('If disabled - it will show infowindow on click event')));
+			?>
+		</div>
+		<label for="map_optsinfowindow_on_mouseover_check" class="gmpFormLabel">
+			<?php langGmp::_e('Show marker infowindow on mouse over (no click)')?>
+		</label>
+	</div>
+	<div class="gmpFormRow">
+		<div class="gmpFormElemCon">
+		<?php
+			 echo htmlGmp::selectbox('map_opts[zoom]', array(
+				 'attrs' => 'class="gmpMap_zoom gmpMapZoomOpts gmpInputSmall gmpHintElem" id="gmpMap_zoom"',
+				 'options' => $this->map_opts['zoom'],
+				 'value' => 1,
+				 'hint' => langGmp::_('Default Zoom For Map')))
+		?>
+		</div>
+		<label for="gmpMap_zoom" class="gmpFormLabel">
+			<?php langGmp::_e('Map Zoom Level')?>
+		</label>
+	</div>
+	<div class="gmpFormRow">
+		<div class="gmpFormElemCon">
+		<?php
+			echo htmlGmp::selectbox('map_opts[type]', array(
+				'attrs' => 'class="gmpMap_type gmpInputSmall gmpMapTypeOpt gmpHintElem" id="gmpMap_type"',
+				'options' => $this->map_opts['type'],
+				'hint' => langGmp::_('Select Map Display Mode')));
+		?>
+		</div>
+		<label for="gmpMap_type" class="gmpFormLabel">
+			<?php langGmp::_e('Map Type')?>
+		</label>
+	</div>
+	<div class="gmpFormRow">
+		<div class="gmpFormElemCon">
+		<?php
+			echo htmlGmp::selectbox('map_opts[language]', array(
+				'attrs' => 'class="gmpMap_language gmpInputSmall gmpMapLngOpt gmpHintElem" id="gmpMap_language"',
+				'options' => $this->map_opts['language'],
+				'value' => 'en',
+				'hint' => langGmp::_('Select Map Display Language')));
+		?>
+		</div>
+		<label for="gmpMap_language" class="gmpFormLabel">
+			<?php langGmp::_e('Map Language')?>
+		</label>
+	</div>
+	<div class="gmpFormRow">
+		<div class="gmpFormElemCon">
+		<?php
+			echo htmlGmp::selectbox('map_opts[align]', array(
+				'attrs' => 'class="gmpInputSmall gmpMapAlignOpt gmpHintElem" id="gmpMap_align"',
+				'options' => $this->map_opts['align'],
+				'hint' => langGmp::_('Map Align')));
+		?>
+		</div>
+		<label for="gmpMap_align" class="gmpFormLabel">
+			<?php langGmp::_e('Map Align')?>
+		</label>
+	</div>
 	<div class="gmpFormRow">
 		<div class="gmpFormElemCon">
 		<?php
@@ -165,7 +163,6 @@
 		<?php
 			echo htmlGmp::colorpicker('map_opts[border_color]', array(
 				'attrs' => 'class="gmpInputSmall map_border_color gmpMapBorderColorOpt gmpHintElem"',
-				//'id' => 'gmpNewMap_border_color_'. $this->params['formId'],
 				'hint' => langGmp::_('Select Map Display Mode')));
 		?>
 		</div>

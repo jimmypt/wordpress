@@ -41,7 +41,13 @@ jQuery(document).ready(function(){
 		}
 		return false;
 	});
-	jQuery('#gmpEditMapContent').tabs();
+	jQuery('#gmpEditMapContent').tabs({
+		activate: function(event, ui) {
+			ui.newTab.find('#gmpTabForNewMapOpts').size() 
+			 ? gmpDoAction('afterMapTabOpen')
+			 : gmpDoAction('afterMarkerTabOpen');
+		}
+	});
 });
 
 function gmpOpenMapForm() {
@@ -81,7 +87,7 @@ function gmpShowEditMap(id) {
 }
 var gmpChangeEventBindedToMarkerDesc = false;
 function gmpBindChangeEventToMarkerDesc() {
-	if(!gmpChangeEventBindedToMarkerDesc) {
+	if(!gmpChangeEventBindedToMarkerDesc && tinymce && tinymce.get('marker_opts_description')) {
 		tinymce.get('marker_opts_description').onChange.add(function (ed, e) {
 			changeAdminFormGmp('gmpAddMarkerToEditMap');
 		});
@@ -128,7 +134,8 @@ function gmpClearMapForm() {
 	if(gmpMapEditMarkersTable) {
 		gmpMapEditMarkersTable.fnClearTable();
 	}
-	gmpMapNameTitleShow('');
+	//gmpMapNameTitleShow('');
+	gmpMapIdShow('');
 }
 function gmpFormatAddress(addressObj){
 	var finishAddr = [];

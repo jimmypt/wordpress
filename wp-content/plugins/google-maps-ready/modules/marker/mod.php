@@ -15,4 +15,11 @@ class  markerGmp extends moduleGmp {
 	public function connectAssets() {
 		frameGmp::_()->addScript('marker', $this->getModPath(). 'js/marker.js');
 	}
+	public function getAnimationList() {
+		return array(
+			0 => langGmp::_('None'),
+			1 => langGmp::_('Drop'),	//DROP
+			2 => langGmp::_('Bounce'),	//BOUNCE
+		);
+	}
 }

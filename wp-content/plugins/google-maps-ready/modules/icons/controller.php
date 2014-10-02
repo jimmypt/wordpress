@@ -3,14 +3,14 @@ class iconsControllerGmp extends controllerGmp {
 	public function saveNewIcon(){
 		$data= reqGmp::get('post');
 		$res = new responseGmp();
-		$result=$this->getModel()->saveNewIcon($data['icon']);
-		if($result){
-			$data['icon']['id']=$result;
+		$result = $this->getModel()->saveNewIcon($data['icon']);
+		if($result) {
+			$data['icon']['id'] = $result;
 			$res->addData($data['icon']);
-		}else{
-			outGmp($this->getModel()->getErrors());
+		} else {
+			$res->pushError( $this->getModel()->getErrors() );
 		}
-		frameGmp::_()->getModule("promo_ready")->getModel()->saveUsageStat("icon.add");            
+		frameGmp::_()->getModule('promo_ready')->getModel()->saveUsageStat('icon.add');
 		return $res->ajaxExec();
 	}
 	public function downloadIconFromUrl(){
@@ -21,9 +21,9 @@ class iconsControllerGmp extends controllerGmp {
 			return $res->ajaxExec();
 		}
 		$result = $this->getModel()->downloadIconFromUrl($data['icon_url']);
-		if($result){
+		if($result) {
 			$res->addData($result);
-		}else{
+		} else {
 			$res->pushError($this->getModel()->getErrors());
 		}
 		return $res->ajaxExec();
@@ -33,6 +33,17 @@ class iconsControllerGmp extends controllerGmp {
 		if(!$this->getModel()->remove(reqGmp::get('post'))) {
 			$res->pushError($this->getModel()->getErrors());
 		}
+		frameGmp::_()->getModule('promo_ready')->getModel()->saveUsageStat('icon.delete');
 		return $res->ajaxExec();
+	}
+	/**
+	 * @see controller::getPermissions();
+	 */
+	public function getPermissions() {
+		return array(
+			GMP_USERLEVELS => array(
+				GMP_ADMIN => array('saveNewIcon', 'downloadIconFromUrl', 'remove')
+			),
+		);
 	}
 }

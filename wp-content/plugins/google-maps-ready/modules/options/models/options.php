@@ -132,14 +132,6 @@ class optionsModelGmp extends modelGmp {
 					// Let's update data in current options params to avoid reload it from database
 					if(isset($d['code']))
 						$this->_setByCode($d['code'], $d['opt_values'][ $d['code'] ]);
-					if(in_array($d['code'], array('bg_color', 'bg_image')) && !isset($d['opt_values'])) {
-						// Let's save this here to avoid push user save it by hands
-						$this->save(array('opt_values' => array('bg_type' => ($d['code'] == 'bg_image' ? 'image' : 'color')), 'code' => 'bg_type'));
-						// Disable Bg slider
-						if($this->get('slider_enabled')) {
-							$this->save(array('opt_values' => array('slider_enabled' => 0), 'code' => 'slider_enabled'));
-						}
-					}
 					return true;
 				} else
 					$this->pushError(langGmp::_('Option '. $d['code']. ' update Failed'));
@@ -160,111 +152,6 @@ class optionsModelGmp extends modelGmp {
 		} else
 			$this->pushError(langGmp::_('Empty data to setup'));
 	}
-	/*
-	public function setBgImgDefault($d = array()) {
-		$code = isset($d['code']) ? $d['code'] : '';
-		if(!empty($code)) {
-			$plTemplate = $this->get('template');		// Current plugin template
-			if($plTemplate && frameGmp::_()->getModule($plTemplate)) {
-				$newValue = frameGmp::_()->getModule($plTemplate)->getDefOptions($code);
-				if($newValue !== NULL && file_exists(frameGmp::_()->getModule($plTemplate)->getModDir(). $newValue)) {
-					// Remove prev. image
-					if(utilsGmp::fileExists( frameGmp::_()->getModule('options')->getBgImgFullDir() ))
-						utilsGmp::deleteFile( frameGmp::_()->getModule('options')->getBgImgFullDir() );
-					// Copy new image from tpl module directory to uploads dirctory
-					copy( frameGmp::_()->getModule($plTemplate)->getModDir(). $newValue, utilsGmp::getUploadsDir(). DS. $this->getModule()->getBgImgDir(). DS. $newValue);
-					if($this->save(array('opt_values' => array($code => $newValue), 'code' => $code))) {
-						return $this->getModule()->getBgImgFullPath();
-					}
-				} else
-					$this->pushError(langGmp::_('There is no default for this option and current template'));
-			} else
-				$this->pushError(langGmp::_('There is no default for this option and current template'));
-		} else
-			$this->pushError(langGmp::_('Empty option code'));
-		return false;
-	}
-	public  function removeBgImg($d = array()) {
-		$bgImgDirPath = frameGmp::_()->getModule('options')->getBgImgFullDir();
-		if($this->save(array('opt_values' => array('bg_image' => ''), 'code' => 'bg_image'))
-			&& utilsGmp::deleteFile( $bgImgDirPath )
-		) {
-			return true;
-		} else
-			$this->pushError(langGmp::_('Unable to remove image'));
-	}
-	public function setLogoDefault($d = array()) {
-		$code = isset($d['code']) ? $d['code'] : '';
-		if(!empty($code)) {
-			$plTemplate = $this->get('template');		// Current plugin template
-			if($plTemplate && frameGmp::_()->getModule($plTemplate)) {
-				$newValue = frameGmp::_()->getModule($plTemplate)->getDefOptions($code);
-				
-				if($newValue !== NULL && file_exists(frameGmp::_()->getModule($plTemplate)->getModDir(). $newValue)) {
-					// Remove prev. image
-					if(utilsGmp::fileExists(frameGmp::_()->getModule('options')->getLogoImgFullDir()))
-						utilsGmp::deleteFile( frameGmp::_()->getModule('options')->getLogoImgFullDir() );
-					// Copy new image from tpl module directory to uploads dirctory
-					copy( frameGmp::_()->getModule($plTemplate)->getModDir(). $newValue, utilsGmp::getUploadsDir(). DS. $this->getModule()->getLogoImgDir(). DS. $newValue);
-					if($this->save(array('opt_values' => array($code => $newValue), 'code' => $code))) {
-						return $this->getModule()->getLogoImgFullPath();
-					}
-				} else
-					$this->pushError(langGmp::_('There is no default for this option and current template'));
-			} else
-				$this->pushError(langGmp::_('There is no default for this option and current template'));
-		} else
-			$this->pushError(langGmp::_('Empty option code'));
-		return false;
-	}
-	public function removeLogoImg($d = array()) {
-		$logoImgDirPath = frameGmp::_()->getModule('options')->getLogoImgFullDir();
-		if($this->save(array('opt_values' => array('logo_image' => ''), 'code' => 'logo_image'))
-			&& utilsGmp::deleteFile( $logoImgDirPath )
-		) {
-			return true;
-		} else
-			$this->pushError(langGmp::_('Unable to remove image'));
-	}
-	public function setTitleParamsDefault($d = array()) {
-		$res = true;
-		$plTemplate = $this->get('template');		// Current plugin template
-		if($plTemplate && frameGmp::_()->getModule($plTemplate)) {
-			$msgTitleColor = frameGmp::_()->getModule($plTemplate)->getDefOptions('msg_title_color');
-			if($msgTitleColor !== NULL) {
-				$this->save(array('opt_values' => array('msg_title_color' => $msgTitleColor), 'code' => 'msg_title_color'));
-			}
-			$msgTitleFont = frameGmp::_()->getModule($plTemplate)->getDefOptions('msg_title_font');
-			if($msgTitleFont !== NULL) {
-				$this->save(array('opt_values' => array('msg_title_font' => $msgTitleFont), 'code' => 'msg_title_font'));
-			}
-			if($msgTitleColor !== NULL || $msgTitleFont !== NULL) {
-				$res = array('msg_title_color' => $msgTitleColor, 'msg_title_font' => $msgTitleFont);
-			}
-		}
-		// good in any case
-		return $res;
-	}
-	public function setTextParamsDefault($d = array()) {
-		$res = true;
-		$plTemplate = $this->get('template');		// Current plugin template
-		if($plTemplate && frameGmp::_()->getModule($plTemplate)) {
-			$msgTextColor = frameGmp::_()->getModule($plTemplate)->getDefOptions('msg_text_color');
-			if($msgTextColor !== NULL) {
-				$this->save(array('opt_values' => array('msg_text_color' => $msgTextColor), 'code' => 'msg_text_color'));
-			}
-			$msgTextFont = frameGmp::_()->getModule($plTemplate)->getDefOptions('msg_text_font');
-			if($msgTextFont !== NULL) {
-				$this->save(array('opt_values' => array('msg_text_font' => $msgTextFont), 'code' => 'msg_text_font'));
-			}
-			if($msgTextColor !== NULL || $msgTextFont !== NULL) {
-				$res = array('msg_text_color' => $msgTextColor, 'msg_text_font' => $msgTextFont);
-			}
-		}
-		// good in any case
-		return $res;
-	}
-	*/
 	public function welcomePageSaveInfo($params){
 		$findOpts=frameGmp::_()->getModule('options')->getFindOptions();
 			$insert=array(

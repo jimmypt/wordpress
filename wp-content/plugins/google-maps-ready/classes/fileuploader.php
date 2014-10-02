@@ -46,8 +46,6 @@
          * @param string $filename name of a file that be uploaded
          */
 		public function validate($inputname, $destSubDir, $destFilename = '') {
-
-			
 			$res = false;
 			if(!empty($_FILES[$inputname]['error'])) {
 				switch($_FILES[$inputname]['error']) {
@@ -87,45 +85,36 @@
 				$this->_inputname = $inputname;
                 $this->_destFilename = $destFilename;
 			}
-
-                        return $res;
+			return $res;
 		}
         /**
          * Upload valid file
          */
-		public function upload() {
+		public function upload($params = array()) {
 			$res = false;
-            add_filter('upload_dir', array($this,'changeUploadDir'));
-           // add_filter('wp_handle_upload_prefilter', array($this,'changeFileName'));
+			$setRandFileName = isset($params['randFileName']) ? $params['randFileName'] : true;
+			add_filter('upload_dir', array($this, 'changeUploadDir'));
+			if($setRandFileName)
+				add_filter('wp_handle_upload_prefilter', array($this, 'changeFileName'));
             $file = $_FILES[ $this->_inputname ];
-                
             $upload = wp_handle_upload($file, array('test_form' => FALSE));
-
             if (isset($upload['type']) && !empty($upload['type'])) {
                 $this->_fileInfo = $file;
                 $this->_fileInfo['name'] = $_FILES[ $this->_inputname ]['name'];
                 $this->_fileInfo['path'] = $file['name'];
-                $data_to_store = array(
-                    'pid' => $this->_pid,
-                    'name' => $_FILES[ $this->_inputname ]['name'],
-                    'path' => $file['name'],
-                    'mime_type' => $upload['type'],
-                    'size' => $file['size'],
-                    'date' => date('Y-m-d H:i:s'),
-                    'active' => 1,
-                    'description' => 'some usual file',
-                    'download_limit' => 0,
-                    'period_limit' => 0,
-                    'type_id' => $this->_typeId,
-                );
-				// We will not use this functionality in this plugin
-                //$this->_fileInfo['id'] = frameGmp::_()->getTable('files')->insert($data_to_store);
+				$this->_fileInfo['url'] = 
+					str_replace('[AFTER_PROTOCOL]', '://', 
+					str_replace('//', '/', 
+					str_replace('://', '[AFTER_PROTOCOL]', 
+					str_replace(DS, '/', $upload['url'])
+				)));
                 $res = true;
             } elseif(isset($upload['error']))
 				$this->_error = $upload['error'];
-            remove_filter('upload_dir', array($this,'changeUploadDir'));
-            remove_filter('wp_handle_upload_prefilter', array($this,'changeFileName'));
-            return $res;
+            remove_filter('upload_dir', array($this, 'changeUploadDir'));
+			if($setRandFileName)
+				remove_filter('wp_handle_upload_prefilter', array($this, 'changeFileName'));
+			return $res;
 		}
         public function getFileInfo() {
             return $this->_fileInfo;

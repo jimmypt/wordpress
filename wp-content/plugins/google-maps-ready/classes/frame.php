@@ -73,7 +73,6 @@ class frameGmp {
                 if(!empty($m['ex_plug_dir'])) {
                     $moduleLocationDir = utilsGmp::getExtModDir( $m['ex_plug_dir'] );
                 }
-
                 if(is_dir($moduleLocationDir. $code)) {
                     $this->_allModules[$m['code']] = 1;
                     if((bool)$m['active']) {
@@ -93,18 +92,19 @@ class frameGmp {
         //$operationTime = microtime(true) - $startTime;
     }
     protected function _initModules() {
-        
         if(!empty($this->_modules)) {
             foreach($this->_modules as $mod) {
-               // outGmp($mod); 
-               // if(get_class($mod)=='templatesGmp'){
-                   // continue;
-                //}
                  $mod->init();                       
                }
         }
-        //exit('end');
     }
+	public function extractModules() {
+		return $this->_extractModules();
+	}
+	public function clearModules() {
+		$this->_modules = array();
+		$this->_allModules = array();
+	}
     public function init() {
         //$startTime = microtime(true);
         langGmp::init();
@@ -180,6 +180,14 @@ class frameGmp {
 					if(is_multisite() && is_admin()) {
 						$currentUserPosition = GMP_ADMIN;
 					}
+					if($currentUserPosition != GMP_ADMIN 
+						&& $this->getModule('access') 
+						&& method_exists($this->getModule('access'), 'currentUserCanAccessPlugin') 
+						&& $this->getModule('access')->currentUserCanAccessPlugin()
+						&& $code != 'options'	// this is bad hook to prevent update options settings by not admins
+					) {
+						$currentUserPosition = GMP_ADMIN;
+					}
                     foreach($permissions[GMP_USERLEVELS] as $userlevel => $methods) {
                         if(is_array($methods)) {
                             $lowerMethods = array_map('strtolower', $methods);          // Make case-insensitive
@@ -234,9 +242,10 @@ class frameGmp {
         }
     }
     protected function _extractTable($tableName, $tablesDir = GMP_TABLES_DIR) {
-        importClassGmp('noClassNameHere', $tablesDir. $tableName. '.php');
+		$tableClass = 'table'. strFirstUp($tableName). strFirstUp(GMP_CODE);
+		if(!class_exists($tableClass))
+			importClassGmp('noClassNameHere', $tablesDir. $tableName. '.php');
         $this->_tables[$tableName] = tableGmp::_($tableName);
-        //var_dump($tableName, $this->_tables[$tableName]);
     }
     /**
      * public alias for _extractTables method

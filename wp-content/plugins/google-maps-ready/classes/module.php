@@ -128,11 +128,12 @@ abstract class moduleGmp extends baseObjectGmp {
 		}
 		if($this->_controller) return true;
 		if(file_exists($this->getModDir(). 'controller.php')) {
-			$className = '';
-			if(import($this->getModDir(). 'controller.php')) {
-				$className = toeGetClassNameGmp($this->getCode(). 'Controller');
+			$className = toeGetClassNameGmp($this->getCode(). 'Controller', true);
+			if(!class_exists($className)) {
+				import($this->getModDir(). 'controller.php');
 			}
-			if(!empty($className)) {
+			//var_dump($className, class_exists($className), $this->getModDir(). 'controller.php');
+			if(!empty($className) && class_exists($className)) {
 				$this->_controller = new $className($this->getCode());
 				$this->_controller->init();
 				return true;
@@ -235,6 +236,9 @@ abstract class moduleGmp extends baseObjectGmp {
 	public function uninstall() {
 
 	}
+	public function activate() {
+		
+	}
 	/**
 	 * Returns the available tabs
 	 * @return array of tab
@@ -245,5 +249,5 @@ abstract class moduleGmp extends baseObjectGmp {
 	public function getConstant($name) {
 		$thisClassRefl = new ReflectionObject($this);
 		return $thisClassRefl->getConstant($name);
-	} 
+	}
 }

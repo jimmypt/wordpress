@@ -23,9 +23,13 @@ class markerModelGmp extends modelGmp {
 				$marker['create_date'] = date('Y-m-d H:i:s');
 			$marker['params'] = utilsGmp::serialize($marker['params']);
 			if($update) {
+				dispatcherGmp::doAction('beforeMarkerUpdate', $id, $marker);
 				$dbRes = frameGmp::_()->getTable('marker')->update($marker, array('id' => $id));
+				dispatcherGmp::doAction('afterMarkerUpdate', $id, $marker);
 			} else {
+				dispatcherGmp::doAction('beforeMarkerInsert', $marker);
 				$dbRes = frameGmp::_()->getTable('marker')->insert($marker);
+				dispatcherGmp::doAction('afterMarkerInsert', $dbRes, $marker);
 			}
 			if($dbRes) {
 				if(!$update)
@@ -72,7 +76,7 @@ class markerModelGmp extends modelGmp {
 		return $marker;
 	}
 
-	public function saveMarkers($markerArr, $mapId) {
+	/*public function saveMarkers($markerArr, $mapId) {
         foreach($markerArr as $marker) {
 			 $marker['map_id'] = $mapId;
              $this->saveMarker($marker);
@@ -97,8 +101,8 @@ class markerModelGmp extends modelGmp {
 		if(!frameGmp::_()->getTable('marker')->insert($marker)) {
 			$this->pushError(frameGmp::_()->getTable('marker')->getErrors());
 		}
-	}
-    public function updateMapMarkers($params, $mapId = null) {
+	}*/
+    /*public function updateMapMarkers($params, $mapId = null) {
         foreach($params as $id => $data) {
 			//self::$tableObj->delete($id);
 			$newId = $id;
@@ -120,8 +124,8 @@ class markerModelGmp extends modelGmp {
 			$params[$id]['params'] = utilsGmp::unserialize($data['params']);
         }
         return $params;
-    }
-    public function updateMarker($marker){
+    }*/
+    /*public function updateMarker($marker){
         $insert = array(
 			'marker_group_id'   =>  $marker['goup_id'],
 			'title'             =>  $marker['title'],
@@ -134,21 +138,12 @@ class markerModelGmp extends modelGmp {
 			'params'			=>  utilsGmp::serialize(array('titleLink' => $marker['titleLink']))
 		);
 		return self::$tableObj->update($insert," `id`='".$marker['id']."'");
-    }
+    }*/
     public function getMapMarkers($mapId, $withGroup = false) {
         $markers = frameGmp::_()->getTable('marker')->get('*',array('map_id'=>$mapId));
         $iconsModel =  frameGmp::_()->getModule('icons')->getModel();
 		$groupModel = frameGmp::_()->getModule('marker_groups')->getModel();
         foreach($markers as $i => $m) {
-            /*$markers[$i]['icon'] = $iconsModel->getIconFromId($markers[$i]['icon']);
-			if($markers[$i]['params']) {
-				$params = utilsGmp::unserialize($markers[$i]['params']);
-				if($params) {
-					foreach($params as $k=>$v){
-						$markers[$i][$k] = $v;
-					}
-				}
-			}*/
 			$markers[$i] = $this->_afterGet($markers[$i]);
 			if($withGroup) {
 				$markers[$i]['groupObj'] = $groupModel->getGroupById($markers[$i]['marker_group_id']);
@@ -163,7 +158,8 @@ class markerModelGmp extends modelGmp {
         return  $params;
     }
     public function removeMarker($markerId){
-       return self::$tableObj->delete(" `id`='".$markerId."' ");
+		dispatcherGmp::doAction('beforeMarkerRemove', $markerId);
+		return frameGmp::_()->getTable('marker')->delete(" `id`='".$markerId."' ");
     }
     public function findAddress($params){
         if(!isset($params['addressStr']) || strlen($params['addressStr']) < 3){
@@ -202,18 +198,8 @@ class markerModelGmp extends modelGmp {
         $markerGroupModel = frameGmp::_()->getModule('marker_groups')->getModule()->getModel();
         foreach($markerList as $i => &$m) {
 			$markerList[$i] = $this->_afterGet($markerList[$i], $widthMapData);
-           /* $m['icon'] = $iconsModel->getIconFromId($m['icon']);
-            $m['map'] = $mapModel->getMapById($m['map_id'],false);*/
             $m['marker_group'] = $markerGroupModel->getGroupById($m['marker_group_id']);
-			/*if($m['params']) {
-				$params = utilsGmp::unserialize($m['params']);
-				if($params) {
-					foreach($params as $k=>$v) {
-						$m[$k] = $v;
-					}
-				}
-			}*/
-        }        
+        } 
         return $markerList;
     }
 	public function setMarkersToMap($addMarkerIds, $mapId) {

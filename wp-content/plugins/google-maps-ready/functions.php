@@ -95,9 +95,9 @@ if(!function_exists('importClassGmp')) {
  * @return string existing class name
  */
 if(!function_exists('toeGetClassNameGmp')) {
-    function toeGetClassNameGmp($class) {
+    function toeGetClassNameGmp($class, $forceUniq = false) {
         $className = '';
-		if(class_exists($class. strFirstUp(GMP_CODE))) 
+		if(class_exists($class. strFirstUp(GMP_CODE)) || $forceUniq) 
 			$className = $class. strFirstUp(GMP_CODE);
 		else if(class_exists(GMP_CLASS_PREFIX. $class)) 
             $className = GMP_CLASS_PREFIX. $class;

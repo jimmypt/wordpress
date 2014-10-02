@@ -392,4 +392,43 @@ class utilsGmp {
 	public static function listToJson($array){
 		return str_replace("'","\'", str_replace('\\','\\\\',utilsGmp::jsonEncode($array)));
 	}
+	static public function getMaxUploadFileSize($returnFormat = '') {
+		static $upload_size;
+        if (!$upload_size) {
+            $max_upload = (int) self::returnBytes((@ini_get('upload_max_filesize')));
+            $max_post = (int) self::returnBytes((@ini_get('post_max_size')));
+            $memory_limit = (int) self::returnBytes((@ini_get('memory_limit')));
+            $upload_size = min($max_upload, $max_post, $memory_limit);
+        }
+		if(!empty($returnFormat)) {
+			return self::returnBytesFormatted($upload_size, $returnFormat);
+		}
+        return $upload_size;
+	}
+	static public function returnBytes($val) {
+        $val = trim($val);
+        $last = strtolower($val[strlen($val) - 1]);
+        switch ($last) {
+            // The 'G' modifier is available since PHP 5.1.0
+            case 'g':
+                $val *= 1024;
+            case 'm':
+                $val *= 1024;
+            case 'k':
+                $val *= 1024;
+        }
+        return $val;
+    }
+	static public function returnBytesFormatted($val, $format) {
+		$format = strtolower($format);
+		switch($format) {
+			case 'g':
+                $val /= 1024;
+            case 'm':
+                $val /= 1024;
+            case 'k':
+                $val /= 1024;
+		}
+		return $val;
+	}
 }

@@ -2,7 +2,8 @@ function gmpUploadNewIconStart(param){
     jQuery('.gmpFileUpRes img').attr('src', GMP_DATA.loader);
 }
 function drawNewIcon(icon){
-	if(typeof(icon.data)==undefined){
+	console.log(icon);
+	if(typeof(icon.data) == undefined){
 		return;
 	}
 	var newElem = '<a class="markerIconItem active" data_name="'+icon.title+'" data_desc="'+icon.description+'" '
@@ -11,8 +12,8 @@ function drawNewIcon(icon){
 		newElem += '<span class="gmpMarkerIconRemoveBtn gmpHidden"><img src="'+ GMP_DATA.imgPath+ 'delete.png" /></span>';
 		newElem += '</a>';
 	jQuery('.markerIconItem').removeClass('active');
-	gmpCurrentMarkerForm.find('.gmpIconsList').append(newElem);
-	jQuery('.gmpIconsList').scrollTop(jQuery('.gmpIconsList')[0].scrollHeight);
+	gmpCurrentMarkerForm.find('.gmpIconsList').prepend(newElem);
+	jQuery('.gmpIconsList').scrollTop( 0 );
 	if(gmpExistsIcons == undefined){
 		gmpExistsIcons = [];
 	}
@@ -60,8 +61,8 @@ jQuery(document).ready(function(){
    * wp media upload
    * 
    */
-    jQuery('.gmpUploadIcon').click(function(e) {
-         e.preventDefault();
+	jQuery('.gmpUploadIcon').click(function(e){
+		e.preventDefault();
          //If the uploader object has already been created, reopen the dialog
         if (custom_uploader) {
             custom_uploader.open();
@@ -69,48 +70,46 @@ jQuery(document).ready(function(){
         }
          //Extend the wp.media object
         custom_uploader = wp.media.frames.file_frame = wp.media({
-            title: 'Choose Image',
-            button: {
+            title: 'Choose Image'
+		,	button: {
                 text: 'Choose Image'
-            },
-            multiple: false
+            }
+		,	multiple: false
         });
         //When a file is selected, grab the URL and set it as the text field's value
-        var currentForm = jQuery(this).parents("form");
-        custom_uploader.on('select', function() {
-           var  attachment = custom_uploader.state().get('selection').first().toJSON();
-            var respElem = jQuery('.gmpUplRes');
-            
-             var sendData={
-                     page    :'icons',
-                     action  :"saveNewIcon",
-                     reqType :"ajax",
-                     icon    :{
-                                url:attachment.url,
-                              }
-                }
-                if(attachment.title!=undefined){
-                    sendData.icon.title=attachment.title;
-                }
-                if(attachment.description !=undefined){
+        var currentForm = jQuery(this).parents('form');
+        custom_uploader.on('select', function(){
+			var attachment = custom_uploader.state().get('selection').first().toJSON()
+            ,	respElem = jQuery('.gmpUplRes')
+			,	sendData={
+					page: 'icons'
+				,	action: 'saveNewIcon'
+				,	reqType: 'ajax'
+				,	icon: {
+						url: attachment.url
+					}
+				};
+				if(attachment.title != undefined){
+					sendData.icon.title = attachment.title;
+				}
+                if(attachment.description != undefined){
                     sendData.icon.description = attachment.description;
                 }
                 jQuery.sendFormGmp({
-                    msgElID:respElem,
-                    data:sendData,
-                   onSuccess:function(res){
-                       if(!res.error){
-                           var newItem =drawNewIcon(res.data);
-                       }else{
+					msgElID: respElem
+				,	data: sendData
+				,	onSuccess: function(res){
+						if(!res.error) {
+                           var newItem = drawNewIcon(res.data);
+						} else {
                            respElem.html(data.error.join(','));
-                       }
-                    }
-                })
+						}
+					}
+                });
         });
         //Open the uploader dialog
         custom_uploader.open();
     });
- 
     jQuery('.gmpIconsList').on('click', '.markerIconItem', function(){
 		jQuery('.markerIconItem').removeClass('active');
 		jQuery(this).addClass('active');

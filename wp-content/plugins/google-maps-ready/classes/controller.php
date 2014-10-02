@@ -49,12 +49,11 @@ abstract class controllerGmp {
 	protected function _createModel($name = '') {
 		if(empty($name)) $name = $this->getCode();
 		$parentModule = frameGmp::_()->getModule( $this->getCode() );
-		$className = '';
-		if(import($parentModule->getModDir(). 'models'. DS. $name. '.php')) {
-			$className = toeGetClassNameGmp($name. 'Model');
+		$className = toeGetClassNameGmp($name. 'Model', true);
+		if(!class_exists($className)) {
+			import($parentModule->getModDir(). 'models'. DS. $name. '.php');
 		}
-		
-		if($className) {
+		if($className && class_exists($className)) {
 			$model = new $className();
 			$model->setCode( $this->getCode() );
 			return $model;
@@ -64,13 +63,11 @@ abstract class controllerGmp {
 	protected function _createView($name = '') {
 		if(empty($name)) $name = $this->getCode();
 		$parentModule = frameGmp::_()->getModule( $this->getCode() );
-		$className = '';
-		
-		if(import($parentModule->getModDir(). 'views'. DS. $name. '.php')) {
-			$className = toeGetClassNameGmp($name. 'View');
+		$className = toeGetClassNameGmp($name. 'View', true);
+		if(!class_exists($className)) {
+			import($parentModule->getModDir(). 'views'. DS. $name. '.php');
 		}
-		
-		if($className) {
+		if($className && class_exists($className)) {
 			$view = new $className();
 			$view->setCode( $this->getCode() );
 			return $view;

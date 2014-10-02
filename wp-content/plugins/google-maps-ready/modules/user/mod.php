@@ -10,10 +10,10 @@ class userGmp extends moduleGmp {
     }
 
     public function isAdmin() {
-        if(!function_exists('wp_get_current_user')) {
-                 frameGmp::_()->loadPlugins();
-          }
-        return current_user_can('administrator');
+		if(!function_exists('wp_get_current_user')) {
+			frameGmp::_()->loadPlugins();
+		}
+        return current_user_can('manage_options');
     }
 
 	public function getCurrentUserPosition() {

@@ -9,5 +9,4 @@ class  iconsGmp extends moduleGmp {
 			frameGmp::_()->addScript('iconOpts', $this->getModPath() .'js/iconOpts.js');			
 		}
     }
-    
 }

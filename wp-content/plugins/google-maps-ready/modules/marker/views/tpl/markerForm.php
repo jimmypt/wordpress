@@ -12,62 +12,6 @@
 				</a>
 				<div id="gmpUpdateMarkerItemMsg"></div>
 			</div>
-			<?php 
-			switch($this->params['formId']){
-				case 'gmpAddMarkerToNewForm':
-					?>
-				   <div class="gmpEditMarkerOpts">
-					   <input type="hidden" id="gmpEditedMarkerLocalId" value="" />
-				   </div>
-				   <?php
-			   break;
-			   case 'gmpEditMarkerForm':
-					/*?>
-					   <div class="gmpAddMarkerOpts gmpMarkerEditformBtns">
-						<?php
-						 echo htmlGmp::button(array(
-							 'attrs' => 'id="gmpSaveEditedMarkerItem" type="submit" class="btn btn-success"',
-							 'value' => "<span class='gmpIcon gmpIconSuccess'></span>". langGmp::_('Save')));
-						 ?>
-					   <a class="btn btn-danger gmpDeleteMarker" onclick="return gmpDeleteMarker();">
-						   <span class="gmpIcon gmpIconReset"></span><?php langGmp::_e('Remove');?>
-					   </a>	   
-					   <div id="gmpUpdateMarkerItemMsg"></div>
-					   </div>
-
-						<?php*/
-			   break;
-			   case 'gmpAddMarkerToEditMap':
-				   /* ?>
-				   <div class="gmpAddMarkerOpts">
-					   <br/>
-					   <br/>
-				   <?php
-					echo htmlGmp::submit('drawMarker', 
-							array("attrs"=>'id="AddMarkerToMap" class="btn btn-primary"',
-								  'value'=>langGmp::_("Add Marker")));
-				   ?>
-				   </div>
-				   <div class="gmpEditMarkerOpts">
-					   <br/>
-					   <br/>
-					   <a class="btn btn-success gmpSaveEditedMarker" id="gmpSaveEditedMarker">
-						   <?php langGmp::_e("Save Marker")?>
-					   </a>
-
-							 <a class="btn btn-danger gmpCancelMarkerEditing" id="gmpCancelMarkerEditing" >
-								 <?php langGmp::_e("Cancel")?>
-							 </a> 
-					   <a class='btn btn-danger removeMarkerFromForm' >
-						   <span class='gmpIcon gmpIconReset'></span>
-						   <?php langGmp::_e("Remove");?>											
-					   </a>
-				   </div> 
-						<?php
-						*/
-					break;
-			}
-			?>
 			<div class="gmpEditMarkerOpts">
 				<input type="hidden" id="gmpEditedMarkerLocalId" value="" />
 			</div>
@@ -114,8 +58,9 @@
 		<div class="gmpFormRow">
 			<label for="gmpNewMap_marker_desc" class="gmpFormLabel"><?php langGmp::_e('Marker Description')?></label>
 			<?php wp_editor('', 'marker_opts_description' , array(
-				'quicktags' => false,
+				//'quicktags' => false,
 				'dfw' => true,
+				'drag_drop_upload' => true,
 			));?>
 		</div>
 		<div class="gmpMarkericonOptions">
@@ -139,10 +84,10 @@
 				<?php
 					 $defIcon = false;
 					 $activeClassName = '';
-					 foreach($this->marker_opts['icons'] as $icon){
+					 foreach(array_reverse($this->marker_opts['icons']) as $icon) {
 						   if(!$defIcon){
-							   $defIcon=$icon['id'];
-							   $activeClassName=' active';
+							   $defIcon = $icon['id'];
+							   $activeClassName = ' active';
 						   }
 				?>
 						<a class="markerIconItem <?php echo $activeClassName;?>" data_name="<?php echo $icon['title'];?>" data_desc="<?php echo $icon['description']; ?>" title="<?php echo $icon['title'];?>" data_val="<?php echo $icon['id'];?>">
@@ -166,8 +111,9 @@
 		<div class="gmpFormRow">
 			<label for="marker_opts[animation]"><?php langGmp::_e('Marker Animation')?></label> 
 			<div class="gmpFormElemCon">
-				<?php echo htmlGmp::checkboxHiddenVal('marker_opts[animation]', array(
-					'attrs' => 'id="marker_opts_animation" class="gmpHintElem marker_optsanimation"',
+				<?php echo htmlGmp::selectbox('marker_opts[animation]', array(
+					'attrs' => 'class="gmpHintElem"',
+					'options' => $this->animOpts,
 					'hint' => langGmp::_('Enable Marker Animation')));?>
 			</div>
 		</div>
