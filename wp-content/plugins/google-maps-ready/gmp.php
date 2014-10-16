@@ -3,7 +3,7 @@
  * Plugin Name: Google Maps Ready!
  * Plugin URI: http://readyshoppingcart.com/product/google-maps-plugin/
  * Description: Display custom Google Maps. Set markers and locations with text, images, categories and links. Customize google map without any programming skills
- * Version: 1.2.2
+ * Version: 1.2.5.2
  * Author: Google Maps plugin
  * Author URI: http://readyshoppingcart.com
  **/
@@ -34,7 +34,7 @@
     importClassGmp('errorsGmp');
     importClassGmp('utilsGmp');
     importClassGmp('modInstallerGmp');
-    importClassGmp('wpUpdater');
+    importClassGmp('wpUpdaterGmp');
 	importClassGmp('installerDbUpdaterGmp');
 
     installerGmp::update();

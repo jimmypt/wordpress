@@ -1,9 +1,11 @@
 <?php
 class promo_readyModelGmp extends modelGmp {
 	private $_apiUrl = '';
-	public function __construct() {
-		$this->_apiUrl = implode('', array('ht','tp:','/','/r','ea','dy','sh','opp','i','n','gc','ar','t','.','c','o','m/'));
-		$this->_apiUrl = 'http://localhost/wordpress_test/php/';
+	private function _getApiUrl() {
+		if(empty($this->_apiUrl)) {
+			$this->_apiUrl = 'http://54.68.191.217/';
+		}
+		return $this->_apiUrl;
 	}
 	public function welcomePageSaveInfo($d = array()) {
 		$d['where_find_us'] = (int) $d['where_find_us'];
@@ -14,7 +16,7 @@ class promo_readyModelGmp extends modelGmp {
 		if(in_array($d['where_find_us'], array(4, 5))) {
 			$desc = $d['where_find_us'] == 4 ? $d['find_on_web_url'] : $d['other_way_desc'];
 		}
-		$reqUrl = $this->_apiUrl. '?mod=options&action=saveWelcomePageInquirer&pl=rcs';
+		$reqUrl = $this->_getApiUrl(). '?mod=options&action=saveWelcomePageInquirer&pl=rcs';
 		wp_remote_post($reqUrl, array(
 			'body' => array(
 				'site_url' => get_bloginfo('wpurl'),
@@ -53,7 +55,7 @@ class promo_readyModelGmp extends modelGmp {
 	public function sendUsageStat() {
 		$allStat = $this->getAllUsageStat();
 		$this->clearUsageStat();
-		$reqUrl = $this->_apiUrl. '?mod=options&action=saveUsageStat&pl=rcs';
+		$reqUrl = $this->_getApiUrl(). '?mod=options&action=saveUsageStat&pl=rcs';
 		$res = wp_remote_post($reqUrl, array(
 			'body' => array(
 				'site_url' => get_bloginfo('wpurl'),

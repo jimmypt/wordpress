@@ -280,3 +280,13 @@ width: 100px;
 .gmpMapWrapper {
 	position: relative;
 }
+#gmpTableMarkers input[type=checkbox] {
+	margin: 0 !important;
+	padding: 0 !important;
+	float: none !important;
+}
+.gmpRemoveListShell {
+	float: left;
+	padding-left: 10px;
+    padding-top: 13px;
+}

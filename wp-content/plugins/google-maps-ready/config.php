@@ -55,7 +55,7 @@
     
     
     define('GMP_PLUGIN_INSTALLED', true);
-    define('GMP_VERSION', '1.2.2');
+    define('GMP_VERSION', '1.2.5.2');
     define('GMP_USER', 'user');
     
     define('GMP_CLASS_PREFIX', 'gmpc');        

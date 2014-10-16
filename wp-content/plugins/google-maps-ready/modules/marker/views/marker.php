@@ -24,6 +24,7 @@ class markerViewGmp extends viewGmp {
 	public function getDisplayColumns() {
 		if(empty($this->_displayColumns)) {
 			$this->_displayColumns = array(
+				'marker_check'		=> array('label' => htmlGmp::checkbox('check_all_markers'), 'db' => 'id', 'width' => '1'),
 				'id'				=> array('label' => __('ID'), 'db' => 'id', 'width' => '1'),
 				'list_icon'			=> array('label' => __('Icon'), 'db' => 'icon', 'width' => '1'),
 				'list_title'		=> array('label' => __('Title'), 'db' => 'title', 'width' => '1'),

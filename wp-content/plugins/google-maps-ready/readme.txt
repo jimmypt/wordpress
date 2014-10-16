@@ -3,7 +3,7 @@ Contributors: Google Maps plugin
 Donate link: http://readyshoppingcart.com/product/google-maps-plugin/
 Tags: google map, google maps, map, maps, location, direction, marker, geocoder, post map, widget map, widget, google map widget, custom marker icons and text, custom marker text, geo, google map short code,  google map styles, openstreetmap, latitude, longitude, placemarker, pronamic, reverse geocode, v3, wp map, wp maps, google maps ready!
 Tested up to: 4.0
-Stable tag: 1.2.2
+Stable tag: 1.2.5.2
 License: GPLv2 or later
 
 Display custom Google Maps. Set markers and locations with text, images, categories and links. Customize google map without any programming skills
@@ -52,6 +52,27 @@ For more information review google maps plugin [FAQ section](http://readyshoppin
 2. Markers sorting example
 
 == Changelog ==
+= 1.2.5.2 =
+ * Added checkboxes for markers for multiple delete markers in admin area
+ * Corrections for analytics
+ * Some corrections for slide to current selected marker in slider list - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Rename "Full Screen" button - https://readyshoppingcart.com/product/google-maps-plugin/
+
+= 1.2.5.1 =
+ * Minor issues fix
+
+= 1.2.5 =
+ * Small correction for updates process
+ * Some code review
+
+= 1.2.4 =
+ * Fix for statistics usage
+
+= 1.2.3 =
+ * Some additional check for map stylizations
+ * Some correction for slider movement when click on marker - https://readyshoppingcart.com/product/google-maps-plugin/
+ * Small code review
+
 = 1.2.2 =
  * Fix marker description save from both - html and text - editor modes
  * Do not try to move close button in infowindow - this can make error in displaying it, wait until google will add this to API

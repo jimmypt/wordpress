@@ -149,7 +149,7 @@ jQuery(document).ready(function(){
 			<p>So check full features list <a target="_blank" href="http://wordpress.org/plugins/google-maps-ready/">here</a>.</p>
 		</div>
 		<div class="clear"></div>
-		<?php echo htmlGmp::hidden('pl', array('value' => 'gmp'))?>
+		<?php echo htmlGmp::hidden('pl', array('value' => GMP_CODE))?>
 		<?php echo htmlGmp::hidden('mod', array('value' => 'promo_ready'))?>
 		<?php echo htmlGmp::hidden('action', array('value' => 'welcomePageSaveInfo'))?>
 

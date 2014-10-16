@@ -8,19 +8,60 @@ jQuery(document).ready(function(){
 			jQuery('#gmp_marker_coord_x').val(item.lng);
 		}
 	});
-	/*jQuery('.gmp_marker_address').keydown(function(){
-		//clearTimeout(gmpTypeInterval);
-	});
-	jQuery('.gmp_marker_address').keyup(function(){
-		var addr = jQuery(this).val()
-		,	form = jQuery(this).parents('form:first');
-		gmpTypeInterval = setTimeout(function(){
-			startSearchAddress(addr, form);
-		}, 1200);
-		startSearchAddress(addr, form, '.gmpAddrErrors', jQuery(this));
-	});*/
 	gmpRefreshMarkerList();
+	jQuery('#gmpTableMarkers').on('change', 'input[type=checkbox]', function(e){
+		var name = jQuery(this).attr('name')
+		,	checked = jQuery(this).attr('checked');
+		if(name == 'check_all_markers') {
+			var allCheckboxes = jQuery('#gmpTableMarkers').find('input[type=checkbox]:not([name="check_all_markers"])');
+			checked ? allCheckboxes.attr('checked', 'checked') : allCheckboxes.removeAttr('checked');
+		} else {
+			var markerId = name.split('[');
+			markerId = markerId[1].split(']');
+			markerId = parseInt(markerId[0]);
+		}
+		var totalSelectedCheckboxes = jQuery('#gmpTableMarkers').find('input[type=checkbox]:not([name="check_all_markers"]):checked').size()
+		,	selectAllCheckbox = jQuery('#gmpTableMarkers').find('input[type=checkbox][name="check_all_markers"]');
+		if(totalSelectedCheckboxes) {
+			var totalCheckboxes = jQuery('#gmpTableMarkers').find('input[type=checkbox]:not([name="check_all_markers"])').size();
+			jQuery('#gmpTableMarkers_wrapper .gmpRemoveListShell').show();
+			if(totalCheckboxes == totalSelectedCheckboxes) {
+				selectAllCheckbox.get(0).indeterminate = false;
+				selectAllCheckbox.attr('checked', 'checked');
+			} else {
+				selectAllCheckbox.get(0).indeterminate = true;
+				selectAllCheckbox.removeAttr('checked');
+			}
+		} else {
+			jQuery('#gmpTableMarkers_wrapper .gmpRemoveListShell').hide();
+			selectAllCheckbox.get(0).indeterminate  = false;
+			selectAllCheckbox.removeAttr('checked');
+		}
+	});
 });
+function gmpRemoveSelectedMarkers() {
+	var totalSelectedCheckboxes = jQuery('#gmpTableMarkers').find('input[type=checkbox]:not([name="check_all_markers"]):checked');
+	if(confirm('Are you sure want to remove '+ totalSelectedCheckboxes.size()+ ' markers?')) {
+		//gmpRemoveListMsg
+		var removeIds = [];
+		totalSelectedCheckboxes.each(function(){
+			var markerId = jQuery(this).attr('name').split('[');
+			markerId = markerId[1].split(']');
+			markerId = parseInt(markerId[0]);
+			if(markerId)
+				removeIds.push(markerId);
+		});
+		jQuery.sendFormGmp({
+			msgElID: jQuery('#gmpTableMarkers_wrapper .gmpRemoveListShell .gmpRemoveListMsg')
+		,	data: {page: 'marker', action: 'removeList', remove_ids: removeIds, reqType: 'ajax'}
+		,	onSuccess: function(res) {
+				if(!res.error) {
+					gmpRefreshMarkerList();
+				}
+			}
+		});
+	}
+}
 function gmpRemoveMarkerItemFromMarkerForm() {
 	var markerId = parseInt(jQuery('#gmpAddMarkerToEditMap').find('[name="marker_opts[id]"]').val());
 	gmpRemoveMarkerItem(markerId, {
@@ -211,6 +252,14 @@ function gmpRefreshMarkerList() {
 			gmpSwitchDataTablePagination(dataTbl);
 		}
 	});
+	jQuery('#gmpTableMarkers').find('input[type=checkbox][name="check_all_markers"]')
+		.removeAttr('checked')
+		.get(0).indeterminate = false;
+	gmpAppendListRemoveBtn();
+}
+function gmpAppendListRemoveBtn() {
+	var removeShell = jQuery('.gmpRemoveListShell.gmpExample').clone().removeClass('gmpExample').hide();
+	removeShell.insertAfter( jQuery('#gmpTableMarkers_length') );
 }
 function cancelEditMarkerItem(params) {
     clearMarkerForm(jQuery('#gmpEditMarkerForm'));
@@ -222,41 +271,9 @@ function cancelEditMarkerItem(params) {
     }
     return false;
 }
-/*function gmpDeleteMarker(markerId) {
-        var marker=markerArr[markerId];
-        gmpRemoveMarkerObj(marker);
-        cancelEditMarkerItem();
-}*/
 var gmpTypeInterval;                //timer identifier
 var gmpDoneTypingInterval = 5000;  //time in ms, 5 second for example
 
-/*function gmpIsMarkerFormEditing(){
-    if(gmpCurrentMarkerForm.find(".gmpMarkerTitleOpt").val()!=""){
-        return true;
-    }
-    if(gmpCurrentMarkerForm.find(".gmpMarkerTitleIsLinkOpt").prop("checked")){
-        return true;
-    }
-    if(gmpCurrentMarkerForm.find(".marker_optsanimation").prop("checked")){
-        return true;
-    }
-    if(tinyMCE.activeEditor.getContent()!=""){
-        return true;
-    }
-    if(gmpCurrentMarkerForm.find(".gmpMarkerAddressOpt").val()!=""){
-        return true;
-    }
-    if(gmpCurrentMarkerForm.find(".gmpMarkerTitleOpt").val()!=""){
-        return true;
-    }
-    if(gmpCurrentMarkerForm.find(".gmpMarkerCoordXOpt").val()!=""){
-        return true;
-    }
-    if(gmpCurrentMarkerForm.find(".gmpMarkerCoordYOpt").val()!=""){
-        return true;
-    }
-    return false;  
-}*/
 function gmpAddNewMarker(param){
 	var canClearMarkerForm = !isAdminFormChanged('gmpAddMarkerToEditMap') || confirm(toeLangGmp('Cancel Editind And Add New Marker'));
 	if(canClearMarkerForm) {
@@ -265,17 +282,6 @@ function gmpAddNewMarker(param){
 		// In any case - changes will be erased
 		adminFormSavedGmp(jQuery(markerForm).attr('id'));
 	}
-    /*if(isAdminFormChanged('gmpAddMarkerToEditMap')) {
-        if(confirm(toeLangGmp('Cancel Editind And Add New Marker'))) {
-            
-        }
-    }*/
-	
-    /*if(gmpIsMarkerFormEditing()) {
-        if(confirm(toeLangGmp('Cancel Editind And Add New Marker'))) {
-            clearMarkerForm(param.markerForm ? param.markerForm : gmpCurrentMarkerForm);
-        }
-    }*/
 }
 function gmpClearMarkerForm() {
 	jQuery('#gmpAddMarkerToEditMap')[0].reset();

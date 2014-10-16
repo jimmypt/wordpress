@@ -159,8 +159,12 @@ class markerModelGmp extends modelGmp {
     }
     public function removeMarker($markerId){
 		dispatcherGmp::doAction('beforeMarkerRemove', $markerId);
-		return frameGmp::_()->getTable('marker')->delete(" `id`='".$markerId."' ");
+		return frameGmp::_()->getTable('marker')->delete(array('id' => $markerId));
     }
+	public function removeList($ids) {
+		$ids = array_map('intval', $ids);
+		return frameGmp::_()->getTable('marker')->delete(array('additionalCondition' => 'id IN ('. implode(',', $ids). ')'));
+	}
     public function findAddress($params){
         if(!isset($params['addressStr']) || strlen($params['addressStr']) < 3){
             $this->pushError(langGmp::_('Address is empty or not match'));

@@ -123,8 +123,8 @@ var gmapPreview = {
 			return false;
 		}
 		var mapElemId = 'ready_google_map_'+ mapForPreview.id
-		,	lat = 44.5234475708		// default coords
-		,	lng = 40.1879714881;	// default coords
+		,	lat = 40.7127837		// default coords - NY
+		,	lng = -74.00594130000002;	// default coords - NY
 		if(typeof(mapForPreview.params.map_center) != 'undefined') {
 			lat = mapForPreview.params.map_center.coord_y;
 			lng = mapForPreview.params.map_center.coord_x;

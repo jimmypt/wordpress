@@ -28,9 +28,9 @@ class markerControllerGmp extends controllerGmp {
     }
     public function removeMarker(){
         $params = reqGmp::get('post');
-        $res =new responseGmp();
+        $res = new responseGmp();
         if(!isset($params['id'])){
-            $res->pushError(langGmp::_("Marker Not Found"));
+            $res->pushError(langGmp::_('Marker Not Found'));
             return $res->ajaxExec();
         }    
         if($this->getModel()->removeMarker($params["id"])){
@@ -38,9 +38,24 @@ class markerControllerGmp extends controllerGmp {
         }else{
             $res->pushError(langGmp::_("Cannot remove marker"));
         }
-        frameGmp::_()->getModule("promo_ready")->getModel()->saveUsageStat("marker.delete");        
+        frameGmp::_()->getModule("promo_ready")->getModel()->saveUsageStat('marker.delete');
         return $res->ajaxExec();
     }
+	public function removeList() {
+		$params = reqGmp::get('post');
+        $res = new responseGmp();
+        if(!isset($params['remove_ids'])){
+			$res->pushError(langGmp::_('Marker Not Found'));
+			return $res->ajaxExec();
+        }
+        if($this->getModel()->removeList($params['remove_ids'])){
+           $res->addMessage(langGmp::_('Done')); 
+        } else {
+            $res->pushError(langGmp::_('Cannot remove markers'));
+        }
+        frameGmp::_()->getModule("promo_ready")->getModel()->saveUsageStat('marker.delete_list');        
+        return $res->ajaxExec();
+	}
 	public function getMarkerForm($params){
 		return $this->getView()->getMarkerForm($params);
 	}
@@ -79,6 +94,7 @@ class markerControllerGmp extends controllerGmp {
 	}
 	private function _convertDataForDatatable($list) {
 		foreach($list as $i => $marker) {
+			$list[$i]['marker_check'] = htmlGmp::checkbox('marker_check['. $list[$i]['id']. ']');
 			$list[$i]['list_icon'] = $this->getView()->getListIcon($list[$i]);
 			$list[$i]['list_title'] = $this->getView()->getListTitle($list[$i]);
 			$list[$i]['group_title'] = $list[$i]['marker_group']['title'];
@@ -110,7 +126,7 @@ class markerControllerGmp extends controllerGmp {
 	public function getPermissions() {
 		return array(
 			GMP_USERLEVELS => array(
-				GMP_ADMIN => array('save', 'removeMarker', 'getMarkerForm', 'getListForTable', 'getMarker')
+				GMP_ADMIN => array('save', 'removeMarker', 'getMarkerForm', 'getListForTable', 'getMarker', 'removeList')
 			),
 		);
 	}

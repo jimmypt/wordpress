@@ -17,12 +17,8 @@
 		</a>
 	</div>
 	<div id="gmpMarkerSingleFormShell" style="float: left; width: 40%;"></div>
-	<?php //echo $this->markerForm; ?>
-	
 	<div class="gmp-marker-right-block" style="width: 55%;">
-		<div class="gmpMapForMarkerEdit" id="gmpMapForMarkerEdit">
-
-		</div>
+		<div class="gmpMapForMarkerEdit" id="gmpMapForMarkerEdit"></div>
 		<div style="clear:both"></div>
 		<?php dispatcherGmp::doAction('underMapAdminFormData');?>
 	</div>

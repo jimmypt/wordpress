@@ -70,3 +70,6 @@
 	word-wrap: break-word; 
 	max-width: 300px;
 }
+.gmp_MapPreview img {
+	background: none !important;
+}
